@@ -1,8 +1,8 @@
 package petrieditor.visual.strategy;
 
-import petrieditor.visual.view.PlaceTransitionComponent;
 import petrieditor.visual.view.GraphPanel;
 import petrieditor.visual.view.PetriNetComponent;
+import petrieditor.visual.view.PlaceTransitionComponent;
 
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
@@ -23,11 +23,11 @@ public class ComponentMouseListner extends MouseInputAdapter {
         this.graphPanel = graphPanel;
     }
 
-
     public void mouseClicked(MouseEvent e) {
-        System.out.println("propaguje dalej do " + graphPanel.currentStrategy);
-        e.translatePoint(e.getComponent().getLocation().x, e.getComponent().getLocation().y);
-        graphPanel.currentStrategy.mouseClicked(e);
+        if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
+            e.translatePoint(e.getComponent().getLocation().x, e.getComponent().getLocation().y);
+            graphPanel.currentStrategy.mouseClicked(e);
+        }
     }
 
     public void mousePressed(MouseEvent e) {

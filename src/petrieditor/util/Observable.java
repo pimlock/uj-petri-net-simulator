@@ -25,6 +25,11 @@ public class Observable<S extends Observable<S, O, A>, O extends Observer<S, O, 
         notifyObservers();
     }
 
+    public void setChangedAndNotifyObservers(A arg) {
+        setChanged();
+        notifyObservers(arg);
+    }
+
     public void notifyObservers() {
         notifyObservers(null);
     }

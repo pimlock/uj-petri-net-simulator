@@ -1,15 +1,14 @@
 package petrieditor.visual.view;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.min;
-
-import petrieditor.model.viewinterfaces.ArcView;
 import petrieditor.model.Arc;
 import petrieditor.model.event.NotifyEvent;
+import petrieditor.model.viewinterfaces.ArcView;
 import petrieditor.util.Observable;
+import petrieditor.visual.util.Arrow2D;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  * @author wiktor
@@ -17,37 +16,55 @@ import java.awt.*;
 public class ArcComponent extends PetriNetComponent implements ArcView {
 
     private Arc model;
-    Rectangle rect, bounds;
-    
-    public ArcComponent(Arc model) {
+    private Rectangle bounds;
+    private Arrow2D arrow2D = new Arrow2D();
 
+    public ArcComponent(Arc model) {
         this.model = model;
-        Point p1 = model.getTransition().getCoords();
-        Point p2 = model.getPlace().getCoords();
-        //TODO: do poprawki
-        rect = new Rectangle(min(p1.x, p2.x), min(p1.y, p2.y), abs(p1.x - p2.x), abs(p1.y - p2.y));
-        bounds = new Rectangle(0, 0, rect.width, rect.height);
-        setBounds(rect);
+        setComponentPopupMenu(new ArcComponentPopup());
+        updateBounds();
     }
 
     protected void paintComponent(Graphics g) {
-        System.out.println("rysuje");
         g.setColor(isHover() ? Color.RED : Color.BLACK);
         g.translate(-getLocation().x, -getLocation().y);
-        g.drawLine(model.getTransition().getCoords().x, model.getTransition().getCoords().y,
-                   model.getPlace().getCoords().x, model.getPlace().getCoords().y);
+        ((Graphics2D) g).draw(arrow2D);
         g.translate(getLocation().x, getLocation().y);
     }
 
     public void update(Observable<Arc, ArcView, NotifyEvent> observable, NotifyEvent event) {
-        Point p1 = model.getTransition().getCoords();
-        Point p2 = model.getPlace().getCoords();
-        rect = new Rectangle(min(p1.x, p2.x), min(p1.y, p2.y), abs(p1.x - p2.x), abs(p1.y - p2.y));
-        bounds = new Rectangle(0, 0, rect.width, rect.height);
-        setBounds(rect);
+        updateBounds();
     }
 
     public boolean contains(int x, int y) {
-        return bounds.contains(x, y);
+        return arrow2D.contains(x + bounds.getX(), y + bounds.getY());
+    }
+
+    public Arc getModel() {
+        return model;
+    }
+
+    private void updateBounds() {
+        if (model.getArcDirection() == Arc.ArcDirection.PLACE_TO_TRASNSITION)
+            arrow2D.setPoints(model.getPlace().getCoords(), model.getTransition().getCoords());
+        else
+            arrow2D.setPoints(model.getTransition().getCoords(), model.getPlace().getCoords());
+        bounds = arrow2D.getBounds();
+        bounds.grow(5, 5);
+        setBounds(bounds);
+    }
+
+    private class ArcComponentPopup extends JPopupMenu {
+
+        public ArcComponentPopup() {
+            JMenuItem item = new JMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent ae) {
+                    ((GraphPanel) ArcComponent.this.getParent()).getModel().removeArc(model);
+                }
+            });
+            item.setText("Remove");
+            add(item);
+        }
+
     }
 }
