@@ -5,8 +5,11 @@ import petrieditor.visual.view.Toolbar;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.ParseException;
 
-/**
+import org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel;
+
+/** 
  * @author wiktor
  */
 public class GUI extends JFrame {
@@ -30,6 +33,13 @@ public class GUI extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
+//                try {
+//                    UIManager.setLookAndFeel(new NimbusLookAndFeel());
+//                } catch (UnsupportedLookAndFeelException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                } catch (ParseException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                }
                 GUI gui = new GUI();
                 gui.setVisible(true);
             }
