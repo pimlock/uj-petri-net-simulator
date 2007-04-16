@@ -84,4 +84,26 @@ public class Place extends Observable<Place, PlaceView, NotifyEvent> {
             outputArc.setChangedAndNotifyObservers();        
         setChangedAndNotifyObservers();
     }
+
+    public boolean hasOutputArcToTransition(Transition toTransition) {
+        for (Arc outputArc : outputArcs) 
+            if (outputArc.getTransition() == toTransition)
+                return true;
+        return false;
+    }
+
+    public boolean hasInputArcFromTransition(Transition fromTransition) {
+        for (Arc inputArc : inputArcs) 
+            if (inputArc.getTransition() == fromTransition)
+                return true;
+        return false;
+    }
+
+    public List<Arc> getInputArcs() {
+        return inputArcs;
+    }
+
+    public List<Arc> getOutputArcs() {
+        return outputArcs;
+    }
 }

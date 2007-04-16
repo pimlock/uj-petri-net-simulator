@@ -67,4 +67,11 @@ public class Transition extends Observable<Transition, TransitionView, NotifyEve
         setChangedAndNotifyObservers();
     }
 
+    public List<Arc> getInputArcs() {
+        return inputArcs;
+    }
+
+    public List<Arc> getOutputArcs() {
+        return outputArcs;
+    }
 }

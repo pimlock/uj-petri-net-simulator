@@ -11,6 +11,8 @@ public abstract class PetriNetComponent extends JComponent {
 
     public abstract boolean contains(int x, int y);
 
+    public abstract Object getModel();
+
     public boolean isHover() {
         return hover;
     }
