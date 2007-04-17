@@ -1,7 +1,5 @@
 package petrieditor.visual.view;
 
-import petrieditor.visual.view.GraphPanel;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,14 +17,14 @@ public class Toolbar extends JToolBar {
         JButton transitionInsert = new JButton("transition");
         transitionInsert.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mainView.changeStategy(mainView.transitionInsertStrategy);
+                mainView.changeStategy(mainView.transitionInsertMouseStrategy);
             }
         });
 
         JButton placeInsert = new JButton("place");
         placeInsert.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mainView.changeStategy(mainView.placeInsertStrategy);
+                mainView.changeStategy(mainView.placeInsertMouseStrategy);
             }
         });
 
@@ -34,7 +32,7 @@ public class Toolbar extends JToolBar {
         arcInsert.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("arc");
-                mainView.changeStategy(mainView.arcInsertStrategy);
+                mainView.changeStategy(mainView.arcInsertMouseStrategy);
             }
         });
 
