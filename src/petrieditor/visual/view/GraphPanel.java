@@ -8,7 +8,7 @@ import petrieditor.model.event.EventType;
 import petrieditor.model.event.NotifyEvent;
 import petrieditor.model.viewinterfaces.PetriNetView;
 import petrieditor.util.Observable;
-import petrieditor.visual.strategy.*;
+import petrieditor.visual.mouselisteners.*;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -22,30 +22,29 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
     public static final String MOUSE_LISTENER_CHANGED_PROPERTY = "MouseListenerChanged";
 
     //TODO: uporzadkowac strategie
-    public TransitionInsertStrategy transitionInsertStrategy = new TransitionInsertStrategy(this);
-    public PlaceInsertStrategy placeInsertStrategy = new PlaceInsertStrategy(this);
-    public ArcInsertStrategy arcInsertStrategy = new ArcInsertStrategy(this);
+    public TransitionInsertMouseStrategy transitionInsertMouseStrategy = new TransitionInsertMouseStrategy(this);
+    public PlaceInsertMouseStrategy placeInsertMouseStrategy = new PlaceInsertMouseStrategy(this);
+    public ArcInsertMouseStrategy arcInsertMouseStrategy = new ArcInsertMouseStrategy(this);
 
     public MouseInputAdapter mia = new ComponentMouseListner(this);
 
-    public Strategy currentStrategy;
+    public MouseStrategy currentMouseStrategy;
     private PetriNet model = new PetriNet();
 
     public GraphPanel() {
         model.addObserver(this);
-        currentStrategy = placeInsertStrategy;
-        addMouseListener(currentStrategy);
-        addPropertyChangeListener(MOUSE_LISTENER_CHANGED_PROPERTY, currentStrategy);
-        System.out.println(getMouseListeners().length);
+        currentMouseStrategy = placeInsertMouseStrategy;
+        addMouseListener(currentMouseStrategy);
+        addPropertyChangeListener(MOUSE_LISTENER_CHANGED_PROPERTY, currentMouseStrategy);
     }
 
-    public void changeStategy(Strategy newStrategy) {
-        firePropertyChange(MOUSE_LISTENER_CHANGED_PROPERTY, currentStrategy, newStrategy);
-        removeMouseListener(currentStrategy);
-        removePropertyChangeListener(MOUSE_LISTENER_CHANGED_PROPERTY, currentStrategy);
-        currentStrategy = newStrategy;
-        addMouseListener(currentStrategy);
-        addPropertyChangeListener(MOUSE_LISTENER_CHANGED_PROPERTY, currentStrategy);
+    public void changeStategy(MouseStrategy newMouseStrategy) {
+        firePropertyChange(MOUSE_LISTENER_CHANGED_PROPERTY, currentMouseStrategy, newMouseStrategy);
+        removeMouseListener(currentMouseStrategy);
+        removePropertyChangeListener(MOUSE_LISTENER_CHANGED_PROPERTY, currentMouseStrategy);
+        currentMouseStrategy = newMouseStrategy;
+        addMouseListener(currentMouseStrategy);
+        addPropertyChangeListener(MOUSE_LISTENER_CHANGED_PROPERTY, currentMouseStrategy);
     }
 
     public PetriNet getModel() {
@@ -54,6 +53,7 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
 
     public void update(Observable<PetriNet, PetriNetView, NotifyEvent> observable, NotifyEvent event) {
         //TODO: dodac warstwy dla poszczegolnych obiektow
+        //TODO: zrefaktoryzwoac kod (za duzo if'ow)
         System.out.println(event.getEventType());
 
         if (event.getEventType() == EventType.PLACE_ADDED) {
