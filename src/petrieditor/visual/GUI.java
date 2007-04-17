@@ -5,9 +5,6 @@ import petrieditor.visual.view.Toolbar;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.ParseException;
-
-import org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel;
 
 /** 
  * @author wiktor
