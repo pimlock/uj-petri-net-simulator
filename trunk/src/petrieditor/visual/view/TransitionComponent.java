@@ -41,7 +41,6 @@ public class TransitionComponent extends PlaceTransitionComponent implements Tra
     }
 
     public void update(Observable<Transition, TransitionView, NotifyEvent> observable, NotifyEvent event) {
-        //TODO:
         setBounds(model.getCoords().x, model.getCoords().y, WIDTH, HEIGHT);
     }
 

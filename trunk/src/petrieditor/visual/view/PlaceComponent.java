@@ -4,7 +4,6 @@ import petrieditor.model.Place;
 import petrieditor.model.event.NotifyEvent;
 import petrieditor.model.viewinterfaces.PlaceView;
 import petrieditor.util.Observable;
-import petrieditor.visual.renderer.DefaultPlaceRenderer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +13,7 @@ import java.awt.event.ActionEvent;
  * @author wiktor
  */
 public class PlaceComponent extends PlaceTransitionComponent implements PlaceView {
+    private final static int PLACE_RADIUS = 20;
 
     private static final int PLACE_COMPONENT_SIZE = 21;
     private static final Rectangle BOUNDS = new Rectangle(0, 0, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
@@ -25,9 +25,6 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
         setBounds(model.getCoords().x, model.getCoords().y, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
         setComponentPopupMenu(new PlaceComponentPopup());
     }
-
-    //TODO:renderer
-    private DefaultPlaceRenderer renderer = new DefaultPlaceRenderer();
 
     public Place getModel() {
         return model;
@@ -41,7 +38,8 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
             g.setColor(Color.RED);
         else
             g.setColor(Color.BLACK);
-        renderer.render(g, this);
+        g.drawRect(0, 0, PLACE_RADIUS, PLACE_RADIUS);
+        g.drawString(String.valueOf(model.getCurrentMarking()), 10, 10);
     }
 
     public boolean contains(int x, int y) {
@@ -53,22 +51,33 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
     }
 
     public void update(Observable<Place, PlaceView, NotifyEvent> observable, NotifyEvent event) {
-        //TODO:
         setBounds(model.getCoords().x, model.getCoords().y, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
+        repaint();
     }
 
     private class PlaceComponentPopup extends JPopupMenu {
 
         public PlaceComponentPopup() {
-            JMenuItem item = new JMenuItem(new AbstractAction() {
+            JMenuItem removeItem = new JMenuItem(new AbstractAction() {
                 public void actionPerformed(ActionEvent ae) {
                     ((GraphPanel) PlaceComponent.this.getParent()).getModel().removePlace(model);
                 }
             });
-            item.setText("Remove");
-            add(item);
+            removeItem.setText("Remove");
+
+            JMenuItem editTokens = new JMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    String input = JOptionPane.showInputDialog("Number of tokens:", String.valueOf(model.getCurrentMarking()));
+                    model.setCurrentMarking(Integer.parseInt(input));                       
+                }
+            });
+            editTokens.setText("Edit tokens");
+
+
+            add(removeItem);
+            add(editTokens);
         }
-        
+
     }
 
 }
