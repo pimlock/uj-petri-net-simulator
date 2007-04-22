@@ -3,8 +3,8 @@ package petrieditor.visual.view;
 import org.jdesktop.swingx.JXStatusBar;
 import petrieditor.visual.action.FileExitAction;
 import petrieditor.visual.action.FileLoadAction;
-import petrieditor.visual.action.FileSaveAsAction;
 import petrieditor.visual.action.FileNewAction;
+import petrieditor.visual.action.FileSaveAsAction;
 import petrieditor.visual.util.GradientPanel;
 import petrieditor.visual.util.StackLayout;
 
@@ -23,26 +23,25 @@ public class MainFrame extends JFrame {
     public MainFrame() throws HeadlessException {
         setSize(800, 450);
         setLocationRelativeTo(null);
-
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
+        buildMenuBar();
         buildContentPane();
+        buildStatusBar();
     }
 
     private void buildContentPane() {
         graphPanel = new GraphPanel();
         setLayout(new BorderLayout());
-        JPanel panel = new JPanel(new StackLayout());
 
+        JPanel panel = new JPanel(new StackLayout());
         panel.add(new GradientPanel(), StackLayout.BOTTOM);
         panel.add(graphPanel, StackLayout.TOP);
+        
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         add(new Toolbar(graphPanel), BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-        buildMenuBar();
-        buildStatusBar();
     }
 
     private void buildStatusBar() {
