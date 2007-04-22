@@ -1,25 +1,16 @@
-package petrieditor.visual;
+package petrieditor.visual.util;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.LayoutManager;
-import java.awt.Rectangle;
-import java.awt.Shape;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JPanel;
-
 public class GradientPanel extends JPanel {
     protected BufferedImage gradientImage;
-    protected Color gradientStart = new Color(133, 144, 165);
-    protected Color gradientEnd   = new Color(51, 59, 76);
+    protected Color gradientStart = new Color(195, 217, 255);
+    protected Color gradientEnd = new Color(232, 238, 247);
 
     public GradientPanel() {
         this(new BorderLayout());
@@ -30,7 +21,7 @@ public class GradientPanel extends JPanel {
         addComponentListener(new GradientCacheManager());
     }
 
-	protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) {
         createImageCache();
 
         if (gradientImage != null) {
@@ -39,7 +30,7 @@ public class GradientPanel extends JPanel {
             Image backgroundImage = gradientImage.getSubimage(bounds.x, bounds.y, bounds.width, bounds.height);
             g.drawImage(backgroundImage, bounds.x, bounds.y, null);
         }
-	}
+    }
 
     protected void createImageCache() {
         int width = getWidth();
@@ -50,24 +41,22 @@ public class GradientPanel extends JPanel {
         }
 
         if (gradientImage == null ||
-            width != gradientImage.getWidth() ||
-            height != gradientImage.getHeight()) {
+                width != gradientImage.getWidth() ||
+                height != gradientImage.getHeight()) {
 
-            gradientImage = new BufferedImage(width, height,
-                                              BufferedImage.TYPE_INT_RGB);
+            gradientImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
             Graphics2D g2 = gradientImage.createGraphics();
-            GradientPaint painter = new GradientPaint(0, 0, gradientEnd,
-                                                      0, height / 2, gradientStart);
+            GradientPaint painter = new GradientPaint(0, 0, gradientEnd, 0, height, gradientStart);
             g2.setPaint(painter);
-            Rectangle2D rect = new Rectangle2D.Double(0, 0, width, height / 2.0);
+            Rectangle2D rect = new Rectangle2D.Double(0, 0, width, height);
             g2.fill(rect);
 
-            painter = new GradientPaint(0, height / 2, gradientStart,
-                                        0, height, gradientEnd);
-            g2.setPaint(painter);
-            rect = new Rectangle2D.Double(0, (height / 2.0) - 1.0, width, height);
-            g2.fill(rect);
+//            painter = new GradientPaint(0, height / 2, gradientStart,
+//                    0, height, gradientEnd);
+//            g2.setPaint(painter);
+//            rect = new Rectangle2D.Double(0, (height / 2.0) - 1.0, width, height);
+//            g2.fill(rect);
 
             g2.dispose();
         }

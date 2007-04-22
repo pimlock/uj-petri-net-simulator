@@ -38,7 +38,16 @@ public class ComponentMouseListner extends MouseInputAdapter {
         if (!(e.getSource() instanceof PlaceTransitionComponent))
             return;
 
-        ((PlaceTransitionComponent) e.getSource()).translate(dragStart.x - e.getX(), dragStart.y - e.getY());
+        int transX = dragStart.x - e.getX(), transY = dragStart.y - e.getY();
+
+        Point topleft = e.getComponent().getLocation();
+        topleft.translate(-transX, -transY);
+
+        if (topleft.x < 0) transX += topleft.x;
+        if (topleft.y < 0) transY += topleft.y;
+        if (transX == 0 && transY == 0) return;
+
+        ((PlaceTransitionComponent) e.getComponent()).translate(transX, transY);
     }
 
     public void mouseEntered(MouseEvent e) {

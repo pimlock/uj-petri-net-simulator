@@ -4,6 +4,8 @@ import petrieditor.visual.view.GraphPanel;
 import petrieditor.visual.view.PlaceComponent;
 import petrieditor.visual.view.PlaceTransitionComponent;
 import petrieditor.visual.view.TransitionComponent;
+import petrieditor.model.Place;
+import petrieditor.model.Transition;
 
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -11,13 +13,17 @@ import java.beans.PropertyChangeEvent;
 /**
  * @author wiktor
  */
-public class ArcInsertMouseStrategy extends MouseStrategy {
+public abstract class ArcInsertMouseStrategy extends MouseStrategy {
 
     private PlaceTransitionComponent first;
 
     public ArcInsertMouseStrategy(GraphPanel graphPanel) {
         super(graphPanel);
     }
+
+    public abstract void connect(Place place, Transition transition);
+    public abstract void connect(Transition transition, Place place);
+    public abstract boolean isTransitionToPlacePossible();
 
     public void mouseClicked(MouseEvent e) {
         if (!(e.getComponent() instanceof PlaceTransitionComponent))
@@ -33,12 +39,14 @@ public class ArcInsertMouseStrategy extends MouseStrategy {
             first = component;
         } else { // 3. Drugi komponent, ktory zaznaczamy
             if (first instanceof PlaceComponent && component instanceof TransitionComponent) {
-                graphPanel.getModel().connectWithArc(((PlaceComponent) first).getModel(), ((TransitionComponent) component).getModel());
+                connect(((PlaceComponent) first).getModel(), ((TransitionComponent) component).getModel());                
                 first.setSelected(false);
+                first.repaint();
                 first = null;
-            } else if (first instanceof TransitionComponent && component instanceof PlaceComponent) {
-                graphPanel.getModel().connectWithArc(((TransitionComponent) first).getModel(), ((PlaceComponent) component).getModel());
+            } else if (first instanceof TransitionComponent && component instanceof PlaceComponent && isTransitionToPlacePossible()) {
+                connect(((TransitionComponent) first).getModel(), ((PlaceComponent) component).getModel());
                 first.setSelected(false);
+                first.repaint();
                 first = null;
             } else { // 4. Zmieniamy zaznaczenie na akutalnie klikniety komponent tego samego typu
                 first.setSelected(false);

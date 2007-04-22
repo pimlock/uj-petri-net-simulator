@@ -14,6 +14,7 @@ public class PlaceInsertMouseStrategy extends MouseStrategy {
     }
 
     public void mouseClicked(MouseEvent e) {
-        graphPanel.getModel().addNewPlace(e.getPoint());
+        if (e.getButton() == MouseEvent.BUTTON1)
+            graphPanel.getModel().addNewPlace(e.getPoint());
     }
 }

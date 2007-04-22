@@ -4,23 +4,29 @@ import petrieditor.model.Place;
 import petrieditor.model.event.NotifyEvent;
 import petrieditor.model.viewinterfaces.PlaceView;
 import petrieditor.util.Observable;
+import petrieditor.visual.action.EditPlaceNameAction;
+import petrieditor.visual.action.EditTokensAction;
+import petrieditor.visual.action.RemovePlaceAction;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 /**
  * @author wiktor
  */
 public class PlaceComponent extends PlaceTransitionComponent implements PlaceView {
-    private final static int PLACE_RADIUS = 20;
+    public static final int PLACE_DIAMETER = 25;
+    public static final double PLACE_RADIUS = PLACE_DIAMETER / 2.0d;
 
-    private static final int PLACE_COMPONENT_SIZE = 21;
+    private static final Color HOVER_COLOR = new Color(0, 0, 255);
+    private static final Color SELECTED_COLOR = new Color(50, 180, 13);
+    private static final int PLACE_COMPONENT_SIZE = PLACE_DIAMETER + 2;
     private static final Rectangle BOUNDS = new Rectangle(0, 0, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
 
     private final Place model;
 
     public PlaceComponent(final Place model) {
+        super(model.getName());
         this.model = model;
         setBounds(model.getCoords().x, model.getCoords().y, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
         setComponentPopupMenu(new PlaceComponentPopup());
@@ -30,16 +36,26 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
         return model;
     }
 
+    public Point getLabelPosition() {
+        return new Point(getLocation().x + PLACE_DIAMETER, getLocation().y + PLACE_DIAMETER);
+    }
+
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (isSelected())
-            g.setColor(Color.BLUE);
-        else if (isHover())
-            g.setColor(Color.RED);
-        else
-            g.setColor(Color.BLACK);
-        g.drawRect(0, 0, PLACE_RADIUS, PLACE_RADIUS);
-        g.drawString(String.valueOf(model.getCurrentMarking()), 10, 10);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval(0, 0, PLACE_DIAMETER, PLACE_DIAMETER);
+        g2d.setColor(isSelected() ? SELECTED_COLOR : isHover() ? HOVER_COLOR : Color.BLACK);
+        g2d.setStroke(new BasicStroke(1.5f));
+        g2d.drawOval(0, 0, PLACE_DIAMETER, PLACE_DIAMETER);
+
+        //TODO: mozna tutaj posprzatac
+        int dx = 9, dy = 17;
+        if (model.getCurrentMarking() > 9) {
+            dx = 6;
+            dy = 17;
+        }
+
+        g2d.drawString(String.valueOf(model.getCurrentMarking()), dx, dy);
     }
 
     public boolean contains(int x, int y) {
@@ -52,30 +68,16 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
 
     public void update(Observable<Place, PlaceView, NotifyEvent> observable, NotifyEvent event) {
         setBounds(model.getCoords().x, model.getCoords().y, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
-        repaint();
+        label.setText(model.getName());
+        ((GraphPanel) getParent()).updatePreferredSize();
     }
 
     private class PlaceComponentPopup extends JPopupMenu {
 
         public PlaceComponentPopup() {
-            JMenuItem removeItem = new JMenuItem(new AbstractAction() {
-                public void actionPerformed(ActionEvent ae) {
-                    ((GraphPanel) PlaceComponent.this.getParent()).getModel().removePlace(model);
-                }
-            });
-            removeItem.setText("Remove");
-
-            JMenuItem editTokens = new JMenuItem(new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    String input = JOptionPane.showInputDialog("Number of tokens:", String.valueOf(model.getCurrentMarking()));
-                    model.setCurrentMarking(Integer.parseInt(input));                       
-                }
-            });
-            editTokens.setText("Edit tokens");
-
-
-            add(removeItem);
-            add(editTokens);
+            add(new JMenuItem(new EditTokensAction(model)));
+            add(new JMenuItem(new EditPlaceNameAction(model)));
+            add(new JMenuItem(new RemovePlaceAction(model)));
         }
 
     }

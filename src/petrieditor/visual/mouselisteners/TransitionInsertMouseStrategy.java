@@ -14,6 +14,7 @@ public class TransitionInsertMouseStrategy extends MouseStrategy {
     }
 
     public void mouseClicked(MouseEvent e) {
-        graphPanel.getModel().addNewTransition(e.getPoint());
+        if (e.getButton() == MouseEvent.BUTTON1)
+            graphPanel.getModel().addNewTransition(e.getPoint());
     }
 }
