@@ -7,6 +7,7 @@ import petrieditor.util.Observable;
 import petrieditor.visual.action.EditWeightAction;
 import petrieditor.visual.action.RemoveArcAction;
 import petrieditor.visual.util.ArrowHead;
+import petrieditor.visual.util.InhibitorArrowHead;
 import static petrieditor.visual.view.PlaceComponent.PLACE_RADIUS;
 
 import javax.swing.*;
@@ -19,15 +20,16 @@ import static java.lang.Math.*;
  */
 public class ArcComponent extends PetriNetComponent implements ArcView {
 
-    private static final Color ARROW_COLOR = new Color(119, 119, 119);
+    protected static final Color ARROW_COLOR = new Color(119, 119, 119);
 
-    private Arc model;
-    private Rectangle bounds;
-    private ArrowHead arrowHead = new ArrowHead();
+    protected Arc model;
+    protected Rectangle bounds;
+    protected ArrowHead arrowHead;
 
     public ArcComponent(Arc model) {
         super(String.valueOf(model.getWeight()));
         this.model = model;
+        this.arrowHead = model.getWeight() == 0 ? new InhibitorArrowHead() : new ArrowHead();
         updateBounds();
         setComponentPopupMenu(new ArcComponentPopup());
     }
@@ -37,7 +39,8 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
         g2d.setColor(isHover() ? Color.RED : ARROW_COLOR);
         g2d.translate(-getLocation().x, -getLocation().y);
         g2d.draw(arrowHead);
-        g2d.fill(arrowHead);
+        if (model.getWeight() != 0)
+            g2d.fill(arrowHead);
         g2d.translate(getLocation().x, getLocation().y);
     }
 
