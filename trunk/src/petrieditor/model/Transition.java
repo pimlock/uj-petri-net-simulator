@@ -15,14 +15,16 @@ public class Transition extends Observable<Transition, TransitionView, NotifyEve
 
     protected List<Arc> inputArcs, outputArcs;
     protected Point coords;
+    protected String name;
 
-    public Transition() {
+    public Transition(String name) {
         this.inputArcs = new ArrayList<Arc>();
         this.outputArcs = new ArrayList<Arc>();
+        this.name = name;
     }
 
-    public Transition(Point coords) {
-        this();
+    public Transition(Point coords, String name) {
+        this(name);
         this.coords = coords;
     }
 
@@ -73,5 +75,14 @@ public class Transition extends Observable<Transition, TransitionView, NotifyEve
 
     public List<Arc> getOutputArcs() {
         return outputArcs;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        setChangedAndNotifyObservers();
     }
 }

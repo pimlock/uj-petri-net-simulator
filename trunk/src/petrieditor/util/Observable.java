@@ -6,8 +6,8 @@ import java.util.Vector;
  * @author wiktor
  */
 public class Observable<S extends Observable<S, O, A>, O extends Observer<S, O, A>, A> {
-    private boolean changed = false;
-    private Vector<O> obs = new Vector<O>();
+    private transient boolean changed = false;
+    private transient Vector<O> obs = new Vector<O>();
 
     public synchronized void addObserver(O o) {
         if (o == null)
@@ -72,6 +72,17 @@ public class Observable<S extends Observable<S, O, A>, O extends Observer<S, O, 
 
     public synchronized int countObservers() {
         return obs.size();
+    }
+
+    /**
+     * Metoda jest wolana podczas deserializacji ze wzgledu na to, ze changed i obs sa transient.
+     * @return Referencje do samego siebie.
+     */
+    @SuppressWarnings({"UnusedDeclaration"})
+    private Object readResolve() {
+        changed = false;
+        obs = new Vector<O>();
+        return this;
     }
 
 }

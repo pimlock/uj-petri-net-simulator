@@ -1,10 +1,10 @@
 package petrieditor.visual.view;
 
+import petrieditor.model.Arc;
 import petrieditor.model.PetriNet;
 import petrieditor.model.Place;
 import petrieditor.model.Transition;
-import petrieditor.model.Arc;
-import petrieditor.model.event.EventType;
+import static petrieditor.model.event.EventType.*;
 import petrieditor.model.event.NotifyEvent;
 import petrieditor.model.viewinterfaces.PetriNetView;
 import petrieditor.util.Observable;
@@ -24,7 +24,8 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
     //TODO: uporzadkowac strategie
     public TransitionInsertMouseStrategy transitionInsertMouseStrategy = new TransitionInsertMouseStrategy(this);
     public PlaceInsertMouseStrategy placeInsertMouseStrategy = new PlaceInsertMouseStrategy(this);
-    public ArcInsertMouseStrategy arcInsertMouseStrategy = new ArcInsertMouseStrategy(this);
+    public NormalArcInsertMouseStrategy normalArcInsertMouseStrategy = new NormalArcInsertMouseStrategy(this);
+    public InhibitorArcInsertMouseStrategy inhibitorArcInsertMouseStrategy = new InhibitorArcInsertMouseStrategy(this);
 
     public MouseInputAdapter mia = new ComponentMouseListner(this);
 
@@ -51,12 +52,32 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
         return model;
     }
 
+    public void paint(Graphics g) {
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        super.paint(g);
+    }
+
+
+    public void updatePreferredSize() {
+        Dimension dim = new Dimension(0, 0);
+
+        Rectangle bounds;
+        for (Component component : getComponents()) {
+            bounds = component.getBounds();
+            if ((bounds.x + bounds.width) > dim.width) dim.width = bounds.x + bounds.width;
+            if ((bounds.y + bounds.height) > dim.height) dim.height = bounds.y + bounds.height;
+        }
+
+        setPreferredSize(dim);
+        revalidate();
+    }
+
     public void update(Observable<PetriNet, PetriNetView, NotifyEvent> observable, NotifyEvent event) {
         //TODO: dodac warstwy dla poszczegolnych obiektow
         //TODO: zrefaktoryzwoac kod (za duzo if'ow)
         System.out.println(event.getEventType());
 
-        if (event.getEventType() == EventType.PLACE_ADDED) {
+        if (event.getEventType() == PLACE_ADDED) {
             Place model = (Place) event.getObject();
             PlaceComponent component = new PlaceComponent(model);
             model.addObserver(component);
@@ -65,7 +86,7 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
             add(component);
         }
 
-        if (event.getEventType() == EventType.TRANSITION_ADDED) {
+        if (event.getEventType() == TRANSITION_ADDED) {
             Transition model = (Transition) event.getObject();
             TransitionComponent component = new TransitionComponent(model);
             model.addObserver(component);
@@ -74,8 +95,7 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
             add(component);
         }
 
-        if (event.getEventType() == EventType.ARC_ADDED) {
-            System.out.println("arc add");
+        if (event.getEventType() == ARC_ADDED) {
             Arc model = (Arc) event.getObject();
             ArcComponent component = new ArcComponent(model);
             model.addObserver(component);
@@ -84,18 +104,20 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
             add(component);
         }
 
-        if (event.getEventType() == EventType.PLACE_REMOVED || event.getEventType() == EventType.ARC_REMOVED) {
+        if (event.getEventType() == PLACE_REMOVED || event.getEventType() == ARC_REMOVED || event.getEventType() == TRANSITION_REMOVED) {
             remove(findComponentByModel(event.getObject()));
         }
 
-        revalidate();
-        repaint();
+        updatePreferredSize();
     }
 
     private Component findComponentByModel(Object o) {
-        for (Component component : getComponents()) 
-            if (((PetriNetComponent) component).getModel() == o)
-                return component;
+        System.out.println("Searching for " + o);
+        for (Component component : getComponents())
+            if (component instanceof PetriNetComponent)
+                if (((PetriNetComponent) component).getModel() == o)
+                    return component;
+        System.out.println("NOT FOUND!!!!");
         return null;
     }
 }

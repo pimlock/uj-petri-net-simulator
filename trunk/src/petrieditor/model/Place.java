@@ -16,16 +16,18 @@ public class Place extends Observable<Place, PlaceView, NotifyEvent> {
     protected List<Arc> inputArcs, outputArcs;
     protected int initialMarking, currentMarking;
     protected Point coords;
+    protected String name;
 
-    public Place() {
+    public Place(String name) {
         this.inputArcs = new ArrayList<Arc>();
         this.outputArcs = new ArrayList<Arc>();
         this.initialMarking = 0;
         this.currentMarking = 0;
+        this.name = name;
     }
 
-    public Place(Point coords) {
-        this();
+    public Place(Point coords, String name) {
+        this(name);
         this.coords = coords;
     }
 
@@ -105,5 +107,14 @@ public class Place extends Observable<Place, PlaceView, NotifyEvent> {
 
     public List<Arc> getOutputArcs() {
         return outputArcs;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        setChangedAndNotifyObservers();
     }
 }
