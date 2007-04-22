@@ -42,6 +42,8 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
         for (Arc removedArc : removedArcs)
             setChangedAndNotifyObservers(new NotifyEvent<Arc>(removedArc, EventType.ARC_REMOVED));
 
+        arcs.removeAll(removedArcs);
+
         places.remove(place);
         setChangedAndNotifyObservers(new NotifyEvent<Place>(place, EventType.PLACE_REMOVED));
     }
@@ -64,6 +66,8 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
         }
         for (Arc removedArc : removedArcs)
             setChangedAndNotifyObservers(new NotifyEvent<Arc>(removedArc, EventType.ARC_REMOVED));
+
+        arcs.removeAll(removedArcs);
 
         transitions.remove(transition);
         setChangedAndNotifyObservers(new NotifyEvent<Transition>(transition, EventType.TRANSITION_REMOVED));
