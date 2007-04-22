@@ -6,10 +6,10 @@ import java.awt.geom.*;
 
 public class ArrowHead implements Shape, Cloneable {
 
-    GeneralPath head = new GeneralPath();
-    GeneralPath arrow = new GeneralPath();
-    private Point2D.Double pointTo = new Point2D.Double();
-    private Shape transformedArrow;
+    protected GeneralPath head = new GeneralPath();
+    protected GeneralPath arrow = new GeneralPath();
+    protected Point2D.Double pointTo = new Point2D.Double();
+    protected Shape transformedArrow;
 
     private double angle;
 
@@ -38,25 +38,20 @@ public class ArrowHead implements Shape, Cloneable {
         pointTo.setLocation(xTo, yTo);
         arrow.reset();
         arrow.append(head, false);
-        arrow.lineTo(0, -hypot((xFrom - xTo), (yFrom - yTo)));
+        arrow.lineTo(0f, (float) -hypot((xFrom - xTo), (yFrom - yTo)));
 
-        //TODO: czy przy dzieleniu przypadkiem cos zlego nie moze wyniknac
-        try {
-            if (yFrom <= yTo)
-                angle = atan((xFrom - xTo) / (yTo - yFrom));
-            else
-                angle = atan((xFrom - xTo) / (yTo - yFrom)) + Math.PI;
+        if (yFrom <= yTo)
+            angle = atan((xFrom - xTo) / (yTo - yFrom));
+        else
+            angle = atan((xFrom - xTo) / (yTo - yFrom)) + Math.PI;
 
-            if ((xFrom == xTo) && (yFrom == yTo))
-                angle = 0;
-        } catch (Exception e) {
-            e.printStackTrace();  
-        }
+        if ((xFrom == xTo) && (yFrom == yTo))
+            angle = 0;
 
         AffineTransform transform = new AffineTransform();
         transform.translate(pointTo.getX(), pointTo.getY());
         transform.rotate(angle);
-        transformedArrow =  arrow.createTransformedShape(transform);
+        transformedArrow = arrow.createTransformedShape(transform);
     }
 
     public double getAngle() {
