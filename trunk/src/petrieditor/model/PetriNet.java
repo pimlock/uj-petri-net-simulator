@@ -90,6 +90,8 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
     }
 
     public void connectWithInhibitorArc(Place fromPlace, Transition toTransition) {
+        if (fromPlace.hasOutputArcToTransition(toTransition))
+            return;
         Arc newArc = new InhibitorArc(fromPlace, toTransition);
         arcs.add(newArc);
         setChangedAndNotifyObservers(new NotifyEvent<Arc>(newArc, EventType.ARC_ADDED));
