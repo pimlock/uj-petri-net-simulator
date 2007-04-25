@@ -16,24 +16,21 @@ import java.awt.*;
 public class TransitionComponent extends PlaceTransitionComponent implements TransitionView {
     public static final int WIDTH = 31;
     public static final int HEIGHT = 11;
-    private static final Color HOVER_COLOR = new Color(0, 0, 255);
-    private static final Color SELECTED_COLOR = new Color(50, 180, 13);
     private static final Rectangle BOUNDS = new Rectangle(0, 0, WIDTH, HEIGHT);
 
     private final Transition model;
+    private final GraphPanel graphPanel;
 
-    public TransitionComponent(final Transition model) {
+    public TransitionComponent(final Transition model, GraphPanel graphPanel) {
         super(model.getName());
         this.model = model;
+        this.graphPanel = graphPanel;
         setBounds(model.getCoords().x, model.getCoords().y, WIDTH, HEIGHT);
         setComponentPopupMenu(new TransitionComponentPopup());
     }
 
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.drawString(model.getName(), -10, (int) (1.5 * HEIGHT));
-        g.setColor(isSelected() ? SELECTED_COLOR : isHover() ? HOVER_COLOR : Color.BLACK);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
+        graphPanel.currentRenderer.render((Graphics2D) g, this);
     }
 
     public boolean contains(int x, int y) {
@@ -48,6 +45,7 @@ public class TransitionComponent extends PlaceTransitionComponent implements Tra
         setBounds(model.getCoords().x, model.getCoords().y, WIDTH, HEIGHT);
         label.setText(model.getName());
         ((GraphPanel) getParent()).updatePreferredSize();
+        repaint();
     }
 
     public Transition getModel() {

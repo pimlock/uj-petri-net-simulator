@@ -10,18 +10,18 @@ import petrieditor.visual.util.StackLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 /**
  * @author wiktor
  */
 public class MainFrame extends JFrame {
 
-    GraphPanel graphPanel;
+    private GraphPanel graphPanel;
 
     public MainFrame() throws HeadlessException {
         setSize(800, 450);
+        setTitle("UJ Petri Net Editor");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         buildMenuBar();
@@ -46,7 +46,14 @@ public class MainFrame extends JFrame {
 
     private void buildStatusBar() {
         JXStatusBar statusBar = new JXStatusBar();
-        statusBar.add(new JLabel("status"));
+        final JLabel label = new JLabel("Mouse status");
+        statusBar.add(label);
+        graphPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            public void mouseMoved(MouseEvent e) {
+                label.setText(e.getPoint().toString());
+            }
+        });
+        statusBar.addSeparator();        
         add(statusBar, BorderLayout.SOUTH);
     }
 

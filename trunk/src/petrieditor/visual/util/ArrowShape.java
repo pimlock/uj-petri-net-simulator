@@ -1,10 +1,11 @@
 package petrieditor.visual.util;
 
-import static java.lang.Math.*;
 import java.awt.*;
 import java.awt.geom.*;
+import static java.lang.Math.atan;
+import static java.lang.Math.hypot;
 
-public class ArrowHead implements Shape, Cloneable {
+public class ArrowShape implements Shape {
 
     protected GeneralPath head = new GeneralPath();
     protected GeneralPath arrow = new GeneralPath();
@@ -13,7 +14,7 @@ public class ArrowHead implements Shape, Cloneable {
 
     private double angle;
 
-    public ArrowHead() {
+    public ArrowShape() {
         head.moveTo(0, 0);
         head.lineTo(5, -10);
         head.lineTo(0, -7);
@@ -63,7 +64,7 @@ public class ArrowHead implements Shape, Cloneable {
     }
 
     public Rectangle2D getBounds2D() {
-        return arrow.getBounds2D();
+        return transformedArrow.getBounds2D();
     }
 
     public boolean contains(double x, double y) {
@@ -71,7 +72,7 @@ public class ArrowHead implements Shape, Cloneable {
     }
 
     public boolean contains(Point2D p) {
-        return arrow.contains(p);
+        return transformedArrow.contains(p);
     }
 
     public boolean intersects(double x, double y, double w, double h) {
@@ -79,15 +80,15 @@ public class ArrowHead implements Shape, Cloneable {
     }
 
     public boolean intersects(Rectangle2D r) {
-        return arrow.intersects(r);
+        return transformedArrow.intersects(r);
     }
 
     public boolean contains(double x, double y, double w, double h) {
-        return arrow.contains(x, y, w, h);
+        return transformedArrow.contains(x, y, w, h);
     }
 
     public boolean contains(Rectangle2D r) {
-        return arrow.contains(r);
+        return transformedArrow.contains(r);
     }
 
     public PathIterator getPathIterator(AffineTransform at) {

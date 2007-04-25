@@ -21,7 +21,7 @@ public abstract class ArcInsertMouseStrategy extends MouseStrategy {
         super(graphPanel);
     }
 
-    public abstract void connect(Place place, Transition transition);
+    protected abstract void connect(Place place, Transition transition);
     public abstract void connect(Transition transition, Place place);
     public abstract boolean isTransitionToPlacePossible();
 

@@ -8,6 +8,7 @@ import petrieditor.util.Observable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Glowna klasa modelu. Tutaj znajduja sie wszystkie informacje o sieci.
@@ -135,5 +136,24 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
         places = new ArrayList<Place>();
         transitions = new ArrayList<Transition>();
         arcs = new ArrayList<Arc>();
+    }
+
+    public void reset() {
+        for (Place place : places)
+            place.reset();        
+    }
+
+    public void fireRandomTransition() {
+        List<Transition> enabledTransitions = new ArrayList<Transition>();
+        for (Transition transition : transitions) 
+            if (transition.isEnabled())
+                enabledTransitions.add(transition);
+
+        if (enabledTransitions.size() == 0)
+            throw new IllegalStateException("No enabled transitions!");
+
+        Collections.shuffle(transitions);
+
+        transitions.get(0).fire();
     }
 }
