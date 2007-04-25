@@ -25,7 +25,7 @@ public class Application {
         return INSTANCE;
     }
 
-    public JFrame getMainFrame() {
+    public MainFrame getMainFrame() {
         return mainFrame;
     }
 

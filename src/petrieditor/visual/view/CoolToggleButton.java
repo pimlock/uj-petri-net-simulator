@@ -2,45 +2,29 @@ package petrieditor.visual.view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
+import java.awt.geom.RoundRectangle2D;
 
 /**
  * @author wiktor
  * @author Shannon Hickey
  */
-public class CoolButton extends JToggleButton {
+public class CoolToggleButton extends JToggleButton {
     public static final int ALONE = 0;
     public static final int LEFT = 1;
     public static final int MIDDLE = 2;
     public static final int RIGHT = 3;
 
-    private static final Color HOVER_COLOR = Color.WHITE;
     private static final Color FOREGROUND_COLOR = new Color(91, 118, 173);
 
     private int style;
 
-    private final MouseAdapter mouseListner = new MouseAdapter() {
-        public void mouseEntered(MouseEvent me) {
-            setForeground(HOVER_COLOR);
-        }
-
-        public void mouseExited(MouseEvent me) {
-            if (!isSelected())
-                setForeground(FOREGROUND_COLOR);
-        }
-    };
-
-    public CoolButton(int style) {
-        super();
+    public CoolToggleButton(int style) {
         this.style = style;
         setContentAreaFilled(false);
         setBorderPainted(false);
         setForeground(FOREGROUND_COLOR);
-        addMouseListener(mouseListner);
     }
 
     public void paintComponent(Graphics g) {
@@ -120,35 +104,5 @@ public class CoolButton extends JToggleButton {
         g2d.setPaint(isSelected() ? gpSelDown : gpDown);
         g2d.fillRect(0, h / 2, w, h);
         g2d.setClip(clip);
-    }
-
-
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
-
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.WHITE);
-        panel.setLayout(new FlowLayout());
-
-        CoolButton c1 = new CoolButton(1);
-        c1.setText("1");
-        CoolButton c2 = new CoolButton(0);
-        c2.setText("2");
-        CoolButton c3 = new CoolButton(3);
-        c3.setText("3");
-
-        CoolButton c4 = new CoolButton(2);
-        c4.setText("0");
-
-        panel.add(c1);
-        panel.add(c2);
-        panel.add(c3);
-        panel.add(c4);
-
-        frame.add(panel);
-
-        frame.setSize(400, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
     }
 }

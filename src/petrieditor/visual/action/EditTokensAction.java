@@ -19,7 +19,7 @@ public class EditTokensAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
 //        TODO:
-        String input = JOptionPane.showInputDialog("Current number of tokens: " + String.valueOf(model.getCurrentMarking()));
-        model.setCurrentMarking(Integer.parseInt(input));
+        String input = JOptionPane.showInputDialog("Current number of tokens: " + String.valueOf(model.getInitialMarking()));
+        model.setInitialMarking(Integer.parseInt(input));
     }
 }

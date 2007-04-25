@@ -11,6 +11,7 @@ import java.awt.*;
 public abstract class PetriNetComponent extends JComponent {
 
     private boolean hover;
+    protected JPopupMenu popup;
     protected NameLabel label;
 
     public PetriNetComponent(String name) {
@@ -23,6 +24,16 @@ public abstract class PetriNetComponent extends JComponent {
     public abstract Object getModel();
 
     public abstract Point getLabelPosition();
+
+    public void disablePopup() {
+        popup = getComponentPopupMenu();
+        setComponentPopupMenu(null);
+    }
+
+    public void enablePopup() {
+        setComponentPopupMenu(popup);
+        popup = null;
+    }
 
     public boolean isHover() {
         return hover;

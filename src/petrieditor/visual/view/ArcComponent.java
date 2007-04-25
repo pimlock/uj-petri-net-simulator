@@ -6,8 +6,8 @@ import petrieditor.model.viewinterfaces.ArcView;
 import petrieditor.util.Observable;
 import petrieditor.visual.action.EditWeightAction;
 import petrieditor.visual.action.RemoveArcAction;
-import petrieditor.visual.util.ArrowHead;
-import petrieditor.visual.util.InhibitorArrowHead;
+import petrieditor.visual.util.ArrowShape;
+import petrieditor.visual.util.InhibitorArrowShape;
 import static petrieditor.visual.view.PlaceComponent.PLACE_RADIUS;
 
 import javax.swing.*;
@@ -20,28 +20,22 @@ import static java.lang.Math.*;
  */
 public class ArcComponent extends PetriNetComponent implements ArcView {
 
-    protected static final Color ARROW_COLOR = new Color(119, 119, 119);
+    private Arc model;
+    private Rectangle bounds;
+    private ArrowShape arrowShape;
+    private GraphPanel graphPanel;
 
-    protected Arc model;
-    protected Rectangle bounds;
-    protected ArrowHead arrowHead;
-
-    public ArcComponent(Arc model) {
+    public ArcComponent(Arc model, GraphPanel graphPanel) {
         super(String.valueOf(model.getWeight()));
         this.model = model;
-        this.arrowHead = model.getWeight() == 0 ? new InhibitorArrowHead() : new ArrowHead();
+        this.graphPanel = graphPanel;
+        this.arrowShape = model.getWeight() == 0 ? new InhibitorArrowShape() : new ArrowShape();
         updateBounds();
         setComponentPopupMenu(new ArcComponentPopup());
     }
 
     protected void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(isHover() ? Color.RED : ARROW_COLOR);
-        g2d.translate(-getLocation().x, -getLocation().y);
-        g2d.draw(arrowHead);
-        if (model.getWeight() != 0)
-            g2d.fill(arrowHead);
-        g2d.translate(getLocation().x, getLocation().y);
+        graphPanel.currentRenderer.render((Graphics2D) g, this);
     }
 
     public void update(Observable<Arc, ArcView, NotifyEvent> observable, NotifyEvent event) {
@@ -52,7 +46,7 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
     }
 
     public boolean contains(int x, int y) {
-        return arrowHead.intersects(x + bounds.getX() - 3, y + bounds.getY() - 3, 6, 6);
+        return arrowShape.intersects(x + bounds.getX() - 3, y + bounds.getY() - 3, 6, 6);
     }
 
     public Arc getModel() {
@@ -69,7 +63,7 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
         else
             _setTransitionToPlaceArrowLocation();
 
-        bounds = arrowHead.getBounds();
+        bounds = arrowShape.getBounds();
         bounds.grow(5, 5);
         setBounds(bounds);
     }
@@ -106,7 +100,7 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
 
         Point2D.Double transLast = new Point2D.Double(pTrans.getX() + transX, pTrans.getY() + transY);
         Point2D.Double placeFirst = new Point2D.Double(pPlace.getX(), pPlace.getY());
-        arrowHead.setLocation(placeFirst, transLast);
+        arrowShape.setLocation(placeFirst, transLast);
     }
 
     private void _setTransitionToPlaceArrowLocation() {
@@ -123,7 +117,11 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
         Point2D.Double transFirst = new Point2D.Double(pTrans.getX(), pTrans.getY());
         Point2D.Double placeLast = new Point2D.Double(pPlace.getX() + PLACE_RADIUS + d * dx, pPlace.getY() + PLACE_RADIUS + d * dy);
 
-        arrowHead.setLocation(transFirst, placeLast);
+        arrowShape.setLocation(transFirst, placeLast);
+    }
+
+    public Shape getArrowShape() {
+        return arrowShape;
     }
 
     private class ArcComponentPopup extends JPopupMenu {

@@ -37,9 +37,13 @@ public class Transition extends Observable<Transition, TransitionView, NotifyEve
 
         for (Arc outputArc : outputArcs)
             outputArc.getPlace().increaseMarking(outputArc.getWeight());
+
+        setChangedAndNotifyObservers();
     }
 
     public boolean isEnabled() {
+        if (inputArcs.size() == 0 && outputArcs.size() == 0)
+            return false;
         for (Arc inputArc : inputArcs)
             if (!inputArc.isEnabled())
                 return false;        

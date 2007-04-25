@@ -18,16 +18,16 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
     public static final int PLACE_DIAMETER = 25;
     public static final double PLACE_RADIUS = PLACE_DIAMETER / 2.0d;
 
-    private static final Color HOVER_COLOR = new Color(0, 0, 255);
-    private static final Color SELECTED_COLOR = new Color(50, 180, 13);
     private static final int PLACE_COMPONENT_SIZE = PLACE_DIAMETER + 2;
     private static final Rectangle BOUNDS = new Rectangle(0, 0, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
 
     private final Place model;
+    private final GraphPanel graphPanel;
 
-    public PlaceComponent(final Place model) {
+    public PlaceComponent(final Place model, GraphPanel graphPanel) {
         super(model.getName());
         this.model = model;
+        this.graphPanel = graphPanel;
         setBounds(model.getCoords().x, model.getCoords().y, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
         setComponentPopupMenu(new PlaceComponentPopup());
     }
@@ -41,21 +41,7 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
     }
 
     public void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.WHITE);
-        g2d.fillOval(0, 0, PLACE_DIAMETER, PLACE_DIAMETER);
-        g2d.setColor(isSelected() ? SELECTED_COLOR : isHover() ? HOVER_COLOR : Color.BLACK);
-        g2d.setStroke(new BasicStroke(1.5f));
-        g2d.drawOval(0, 0, PLACE_DIAMETER, PLACE_DIAMETER);
-
-        //TODO: mozna tutaj posprzatac
-        int dx = 9, dy = 17;
-        if (model.getCurrentMarking() > 9) {
-            dx = 6;
-            dy = 17;
-        }
-
-        g2d.drawString(String.valueOf(model.getCurrentMarking()), dx, dy);
+        graphPanel.currentRenderer.render((Graphics2D) g, this);
     }
 
     public boolean contains(int x, int y) {
@@ -70,6 +56,7 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
         setBounds(model.getCoords().x, model.getCoords().y, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
         label.setText(model.getName());
         ((GraphPanel) getParent()).updatePreferredSize();
+        repaint();
     }
 
     private class PlaceComponentPopup extends JPopupMenu {
