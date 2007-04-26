@@ -7,7 +7,7 @@ import petrieditor.model.viewinterfaces.ArcView;
 /**
  * @author wiktor
  */
-public class Arc extends Observable<Arc, ArcView, NotifyEvent>  {
+public class Arc extends Observable<Arc, ArcView, NotifyEvent<Arc>>  {
 
     public enum ArcDirection {
         PLACE_TO_TRASNSITION, TRANSITION_TO_PLACE 

@@ -28,7 +28,6 @@ public class DefaultRenderer implements GraphRenderer {
     }
 
     public void render(Graphics2D g2d, TransitionComponent component) {
-        g2d.drawString(component.getModel().getName(), -10, (int) (1.5 * TransitionComponent.HEIGHT));
         g2d.setColor(component.isSelected() ? SELECTED_COLOR : component.isHover() ? HOVER_COLOR : Color.BLACK);
         g2d.fillRect(0, 0, TransitionComponent.WIDTH, TransitionComponent.HEIGHT);
     }

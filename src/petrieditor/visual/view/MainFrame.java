@@ -18,6 +18,7 @@ import java.awt.event.*;
 public class MainFrame extends JFrame {
 
     private GraphPanel graphPanel;
+    private SimulationHistory simulationHistory;
 
     public MainFrame() throws HeadlessException {
         setSize(800, 450);
@@ -31,16 +32,19 @@ public class MainFrame extends JFrame {
 
     private void buildContentPane() {
         graphPanel = new GraphPanel();
+        simulationHistory = new SimulationHistory();
+        simulationHistory.setVisible(false);
         setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new StackLayout());
         panel.add(new GradientPanel(), StackLayout.BOTTOM);
+        panel.add(simulationHistory, StackLayout.TOP);
         panel.add(graphPanel, StackLayout.TOP);
-        
+
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        add(new Toolbar(graphPanel), BorderLayout.NORTH);
+        add(new Toolbar(graphPanel, simulationHistory), BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
     }
 
@@ -53,7 +57,7 @@ public class MainFrame extends JFrame {
                 label.setText(e.getPoint().toString());
             }
         });
-        statusBar.addSeparator();        
+        statusBar.addSeparator();
         add(statusBar, BorderLayout.SOUTH);
     }
 
@@ -100,5 +104,9 @@ public class MainFrame extends JFrame {
 
     public GraphPanel getCurrentGraphPanel() {
         return graphPanel;
+    }
+
+    public SimulationHistory getSimulationHistory() {
+        return simulationHistory;
     }
 }

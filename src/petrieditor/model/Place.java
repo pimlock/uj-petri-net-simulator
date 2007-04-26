@@ -11,7 +11,7 @@ import java.awt.*;
 /**
  * @author wiktor
  */
-public class Place extends Observable<Place, PlaceView, NotifyEvent> {
+public class Place extends Observable<Place, PlaceView, NotifyEvent<Place>> {
 
     protected List<Arc> inputArcs, outputArcs;
     protected int initialMarking, currentMarking;

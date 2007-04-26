@@ -7,5 +7,5 @@ import petrieditor.util.Observer;
 /**
  * @author wiktor
  */
-public interface TransitionView extends Observer<Transition, TransitionView, NotifyEvent> {
+public interface TransitionView extends Observer<Transition, TransitionView, NotifyEvent<Transition>> {
 }

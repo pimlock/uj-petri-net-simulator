@@ -6,6 +6,7 @@ import petrieditor.model.Place;
 import petrieditor.model.Transition;
 import static petrieditor.model.event.EventType.*;
 import petrieditor.model.event.NotifyEvent;
+import petrieditor.model.event.PetriNetObject;
 import petrieditor.model.viewinterfaces.PetriNetView;
 import petrieditor.util.Observable;
 import petrieditor.visual.mouselisteners.*;
@@ -80,13 +81,13 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
         revalidate();
     }
 
-    public void update(Observable<PetriNet, PetriNetView, NotifyEvent> observable, NotifyEvent event) {
+    public void update(Observable<PetriNet, PetriNetView, NotifyEvent<PetriNetObject>> observable, NotifyEvent<PetriNetObject> event) {
         //TODO: dodac warstwy dla poszczegolnych obiektow
         //TODO: zrefaktoryzwoac kod (za duzo if'ow)
         System.out.println(event.getEventType());
 
         if (event.getEventType() == PLACE_ADDED) {
-            Place model = (Place) event.getObject();
+            Place model = event.getObject().getPlace();
             PlaceComponent component = new PlaceComponent(model, this);
             model.addObserver(component);
             component.addMouseMotionListener(mia);
@@ -95,7 +96,7 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
         }
 
         if (event.getEventType() == TRANSITION_ADDED) {
-            Transition model = (Transition) event.getObject();
+            Transition model = event.getObject().getTransition();
             TransitionComponent component = new TransitionComponent(model, this);
             model.addObserver(component);
             component.addMouseMotionListener(mia);
@@ -104,7 +105,7 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
         }
 
         if (event.getEventType() == ARC_ADDED) {
-            Arc model = (Arc) event.getObject();
+            Arc model = event.getObject().getArc();
             ArcComponent component = new ArcComponent(model, this);
             model.addObserver(component);
             component.addMouseListener(mia);
@@ -113,7 +114,7 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
         }
 
         if (event.getEventType() == PLACE_REMOVED || event.getEventType() == ARC_REMOVED || event.getEventType() == TRANSITION_REMOVED) {
-            remove(findComponentByModel(event.getObject()));
+            remove(findComponentByModel(event.getObject().getPetriNetObject()));
         }
 
         updatePreferredSize();

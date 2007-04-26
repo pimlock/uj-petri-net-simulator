@@ -1,6 +1,7 @@
 package petrieditor.model;
 
 import petrieditor.model.event.NotifyEvent;
+import petrieditor.model.event.EventType;
 import petrieditor.model.viewinterfaces.TransitionView;
 import petrieditor.util.Observable;
 
@@ -11,7 +12,7 @@ import java.awt.*;
 /**
  * @author wiktor
  */
-public class Transition extends Observable<Transition, TransitionView, NotifyEvent> {
+public class Transition extends Observable<Transition, TransitionView, NotifyEvent<Transition>> {
 
     protected List<Arc> inputArcs, outputArcs;
     protected Point coords;
@@ -38,7 +39,7 @@ public class Transition extends Observable<Transition, TransitionView, NotifyEve
         for (Arc outputArc : outputArcs)
             outputArc.getPlace().increaseMarking(outputArc.getWeight());
 
-        setChangedAndNotifyObservers();
+        setChangedAndNotifyObservers(new NotifyEvent<Transition>(this, EventType.TRANSITION_FIRED));
     }
 
     public boolean isEnabled() {

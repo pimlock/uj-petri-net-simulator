@@ -38,7 +38,7 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
         graphPanel.currentRenderer.render((Graphics2D) g, this);
     }
 
-    public void update(Observable<Arc, ArcView, NotifyEvent> observable, NotifyEvent event) {
+    public void update(Observable<Arc, ArcView, NotifyEvent<Arc>> observable, NotifyEvent<Arc> event) {
         label.setText(String.valueOf(model.getWeight()));
         label.setLocation(getLabelPosition());
         updateBounds();

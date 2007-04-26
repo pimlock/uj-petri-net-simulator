@@ -52,7 +52,7 @@ public class PlaceComponent extends PlaceTransitionComponent implements PlaceVie
         model.setCoords(new Point(model.getCoords().x - transX, model.getCoords().y - transY));
     }
 
-    public void update(Observable<Place, PlaceView, NotifyEvent> observable, NotifyEvent event) {
+    public void update(Observable<Place, PlaceView, NotifyEvent<Place>> observable, NotifyEvent<Place> event) {
         setBounds(model.getCoords().x, model.getCoords().y, PLACE_COMPONENT_SIZE, PLACE_COMPONENT_SIZE);
         label.setText(model.getName());
         ((GraphPanel) getParent()).updatePreferredSize();
