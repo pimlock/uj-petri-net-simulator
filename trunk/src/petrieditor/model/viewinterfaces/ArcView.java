@@ -7,5 +7,5 @@ import petrieditor.util.Observer;
 /**
  * @author wiktor
  */
-public interface ArcView extends Observer<Arc, ArcView, NotifyEvent> {
+public interface ArcView extends Observer<Arc, ArcView, NotifyEvent<Arc>> {
 }

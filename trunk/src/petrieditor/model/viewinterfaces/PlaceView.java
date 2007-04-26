@@ -7,5 +7,5 @@ import petrieditor.util.Observer;
 /**
  * @author wiktor
  */
-public interface PlaceView extends Observer<Place, PlaceView, NotifyEvent> {
+public interface PlaceView extends Observer<Place, PlaceView, NotifyEvent<Place>> {
 }

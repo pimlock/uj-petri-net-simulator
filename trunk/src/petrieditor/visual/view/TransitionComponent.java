@@ -41,7 +41,7 @@ public class TransitionComponent extends PlaceTransitionComponent implements Tra
         model.setCoords(new Point(model.getCoords().x - transX, model.getCoords().y - transY));
     }
 
-    public void update(Observable<Transition, TransitionView, NotifyEvent> observable, NotifyEvent event) {
+    public void update(Observable<Transition, TransitionView, NotifyEvent<Transition>> observable, NotifyEvent<Transition> event) {
         setBounds(model.getCoords().x, model.getCoords().y, WIDTH, HEIGHT);
         label.setText(model.getName());
         ((GraphPanel) getParent()).updatePreferredSize();

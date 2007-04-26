@@ -2,6 +2,7 @@ package petrieditor.model;
 
 import petrieditor.model.event.EventType;
 import petrieditor.model.event.NotifyEvent;
+import petrieditor.model.event.PetriNetObject;
 import petrieditor.model.viewinterfaces.PetriNetView;
 import petrieditor.util.Observable;
 
@@ -16,7 +17,7 @@ import java.util.Collections;
  * @author wiktor
  */
 
-public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
+public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent<PetriNetObject>> {
 
     private List<Place> places = new ArrayList<Place>();
     private List<Transition> transitions = new ArrayList<Transition>();
@@ -27,7 +28,7 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
         Place newPlace = new Place(coords, "P" + nextPlaceNumber++);
         places.add(newPlace);
         setChanged();
-        notifyObservers(new NotifyEvent<Place>(newPlace, EventType.PLACE_ADDED));
+        notifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newPlace), EventType.PLACE_ADDED));
     }
 
     public void removePlace(Place place) {
@@ -41,18 +42,18 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
             removedArcs.add(arc);
         }
         for (Arc removedArc : removedArcs)
-            setChangedAndNotifyObservers(new NotifyEvent<Arc>(removedArc, EventType.ARC_REMOVED));
+            setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(removedArc), EventType.ARC_REMOVED));
 
         arcs.removeAll(removedArcs);
 
         places.remove(place);
-        setChangedAndNotifyObservers(new NotifyEvent<Place>(place, EventType.PLACE_REMOVED));
+        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(place), EventType.PLACE_REMOVED));
     }
 
     public void addNewTransition(Point coords) {
         Transition newTransition = new Transition(coords, "T" + nextTransitionNumber++);
         transitions.add(newTransition);
-        setChangedAndNotifyObservers(new NotifyEvent<Transition>(newTransition, EventType.TRANSITION_ADDED));
+        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newTransition), EventType.TRANSITION_ADDED));
     }
 
     public void removeTransition(Transition transition) {
@@ -66,12 +67,12 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
             removedArcs.add(arc);
         }
         for (Arc removedArc : removedArcs)
-            setChangedAndNotifyObservers(new NotifyEvent<Arc>(removedArc, EventType.ARC_REMOVED));
+            setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(removedArc), EventType.ARC_REMOVED));
 
         arcs.removeAll(removedArcs);
 
         transitions.remove(transition);
-        setChangedAndNotifyObservers(new NotifyEvent<Transition>(transition, EventType.TRANSITION_REMOVED));
+        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(transition), EventType.TRANSITION_REMOVED));
     }
 
     public void connectWithArc(Place fromPlace, Transition toTransition) {
@@ -79,7 +80,7 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
             return;
         Arc newArc = new Arc(fromPlace, toTransition);
         arcs.add(newArc);
-        setChangedAndNotifyObservers(new NotifyEvent<Arc>(newArc, EventType.ARC_ADDED));
+        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newArc), EventType.ARC_ADDED));
     }
 
     public void connectWithArc(Transition fromTransition, Place toPlace) {
@@ -87,7 +88,7 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
             return;
         Arc newArc = new Arc(fromTransition, toPlace);
         arcs.add(newArc);
-        setChangedAndNotifyObservers(new NotifyEvent<Arc>(newArc, EventType.ARC_ADDED));
+        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newArc), EventType.ARC_ADDED));
     }
 
     public void connectWithInhibitorArc(Place fromPlace, Transition toTransition) {
@@ -95,7 +96,7 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
             return;
         Arc newArc = new InhibitorArc(fromPlace, toTransition);
         arcs.add(newArc);
-        setChangedAndNotifyObservers(new NotifyEvent<Arc>(newArc, EventType.ARC_ADDED));
+        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newArc), EventType.ARC_ADDED));
     }
 
     public void removeArc(Arc arc) {
@@ -107,7 +108,7 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
             arc.getPlace().getInputArcs().remove(arc);
             arc.getTransition().getOutputArcs().remove(arc);
         }
-        setChangedAndNotifyObservers(new NotifyEvent<Arc>(arc, EventType.ARC_REMOVED));
+        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(arc), EventType.ARC_REMOVED));
     }
 
     public void loadPetriNet(PetriNet newModel) {
@@ -118,20 +119,20 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
         this.arcs = newModel.arcs;
 
         for (Place place : places)
-            setChangedAndNotifyObservers(new NotifyEvent<Place>(place, EventType.PLACE_ADDED));
+            setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(place), EventType.PLACE_ADDED));
         for (Transition transition : transitions)
-            setChangedAndNotifyObservers(new NotifyEvent<Transition>(transition, EventType.TRANSITION_ADDED));
+            setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(transition), EventType.TRANSITION_ADDED));
         for (Arc arc : arcs)
-            setChangedAndNotifyObservers(new NotifyEvent<Arc>(arc, EventType.ARC_ADDED));
+            setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(arc), EventType.ARC_ADDED));
     }
 
     public void clear() {
         for (Place place : places)
-            setChangedAndNotifyObservers(new NotifyEvent<Place>(place, EventType.PLACE_REMOVED));
+            setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(place), EventType.PLACE_REMOVED));
         for (Transition transition : transitions)
-            setChangedAndNotifyObservers(new NotifyEvent<Transition>(transition, EventType.TRANSITION_REMOVED));
+            setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(transition), EventType.TRANSITION_REMOVED));
         for (Arc arc : arcs)
-            setChangedAndNotifyObservers(new NotifyEvent<Arc>(arc, EventType.ARC_REMOVED));
+            setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(arc), EventType.ARC_REMOVED));
 
         places = new ArrayList<Place>();
         transitions = new ArrayList<Transition>();
@@ -155,5 +156,9 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent> {
         Collections.shuffle(transitions);
 
         transitions.get(0).fire();
+    }
+
+    public List<Transition> getTransitions() {
+        return transitions;
     }
 }

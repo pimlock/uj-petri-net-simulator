@@ -29,7 +29,6 @@ public class SimulationRenderer implements GraphRenderer {
     }
 
     public void render(Graphics2D g2d, TransitionComponent component) {
-        g2d.drawString(component.getModel().getName(), -10, (int) (1.5 * TransitionComponent.HEIGHT));
         g2d.setColor(component.getModel().isEnabled() ? Color.ORANGE : Color.BLACK);
         g2d.fillRect(0, 0, TransitionComponent.WIDTH, TransitionComponent.HEIGHT);
     }

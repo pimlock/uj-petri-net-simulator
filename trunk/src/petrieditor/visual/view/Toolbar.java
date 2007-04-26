@@ -3,6 +3,7 @@ package petrieditor.visual.view;
 import petrieditor.visual.mouselisteners.SimulationMouseStrategy;
 import petrieditor.visual.mouselisteners.MouseStrategy;
 import petrieditor.visual.Application;
+import petrieditor.model.Transition;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,11 +11,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
+ * TODO: musze uporzadkowac ten kod
+ *
  * @author wiktor
  */
 public class Toolbar extends JToolBar {
 
-    public Toolbar(final GraphPanel graphPanel) {
+    public Toolbar(final GraphPanel graphPanel, final SimulationHistory simulationHistory) {
         final CoolToggleButton placeInsert = new CoolToggleButton(CoolToggleButton.LEFT);
         final CoolToggleButton transitionInsert = new CoolToggleButton(CoolToggleButton.MIDDLE);
         final CoolToggleButton arcInsert = new CoolToggleButton(CoolToggleButton.MIDDLE);
@@ -108,6 +111,9 @@ public class Toolbar extends JToolBar {
                     }
                     tmpMouseStrategy = graphPanel.currentMouseStrategy;
                     graphPanel.changeStategy(new SimulationMouseStrategy(graphPanel));
+                    simulationHistory.setVisible(true);
+                    for (Transition transition : graphPanel.getModel().getTransitions())
+                        transition.addObserver(simulationHistory);
                 } else {
                     graphPanel.currentRenderer = graphPanel.defaultRenderer;
                     for (Component component : graphPanel.getComponents()) {
@@ -119,6 +125,9 @@ public class Toolbar extends JToolBar {
                     graphPanel.getModel().reset();
                     graphPanel.changeStategy(tmpMouseStrategy);
                     tmpMouseStrategy = null;
+                    simulationHistory.setVisible(false);
+                    for (Transition transition : graphPanel.getModel().getTransitions())
+                        transition.deleteObserver(simulationHistory);                    
                 }
 
                 graphPanel.repaint();
