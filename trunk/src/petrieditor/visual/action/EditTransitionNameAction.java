@@ -17,8 +17,8 @@ public class EditTransitionNameAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent ae) {
-        //TODO:
-        String input = JOptionPane.showInputDialog("Current name: " + model.getName());
-        model.setName(input);
+        String input = JOptionPane.showInputDialog("Current name: " + model.getName(), model.getName());
+        if (input != null)
+            model.setName(input);
     }
 }

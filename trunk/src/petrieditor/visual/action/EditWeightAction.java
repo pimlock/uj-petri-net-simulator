@@ -17,8 +17,11 @@ public class EditWeightAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent ae) {
-        //TODO:
-        String input = JOptionPane.showInputDialog("Current weight: " + String.valueOf(model.getWeight()));
-        model.setWeight(Integer.parseInt(input));
+        String initialVal = String.valueOf(model.getWeight());
+        String input = JOptionPane.showInputDialog("Current weight: " + initialVal, initialVal);
+        try {
+            model.setWeight(Integer.parseInt(input));
+        } catch (NumberFormatException nfe) {
+        }
     }
 }

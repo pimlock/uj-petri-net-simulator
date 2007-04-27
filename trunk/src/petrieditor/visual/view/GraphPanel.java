@@ -4,19 +4,20 @@ import petrieditor.model.Arc;
 import petrieditor.model.PetriNet;
 import petrieditor.model.Place;
 import petrieditor.model.Transition;
-import static petrieditor.model.event.EventType.*;
 import petrieditor.model.event.NotifyEvent;
 import petrieditor.model.event.PetriNetObject;
 import petrieditor.model.viewinterfaces.PetriNetView;
 import petrieditor.util.Observable;
+import petrieditor.visual.Application;
 import petrieditor.visual.mouselisteners.*;
+import petrieditor.visual.renderer.DefaultRenderer;
 import petrieditor.visual.renderer.GraphRenderer;
 import petrieditor.visual.renderer.SimulationRenderer;
-import petrieditor.visual.renderer.DefaultRenderer;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
+import java.text.MessageFormat;
 
 /**
  * @author wiktor
@@ -25,24 +26,25 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
 
     public static final String MOUSE_LISTENER_CHANGED_PROPERTY = "MouseListenerChanged";
 
-    //TODO: renderer
+    // Renderers
     public GraphRenderer defaultRenderer = new DefaultRenderer();
     public GraphRenderer simulationRenderer = new SimulationRenderer();
     public GraphRenderer currentRenderer = defaultRenderer;
 
-    //TODO: uporzadkowac strategie
+    // MouseListners
     public TransitionInsertMouseStrategy transitionInsertMouseStrategy = new TransitionInsertMouseStrategy(this);
     public PlaceInsertMouseStrategy placeInsertMouseStrategy = new PlaceInsertMouseStrategy(this);
     public NormalArcInsertMouseStrategy normalArcInsertMouseStrategy = new NormalArcInsertMouseStrategy(this);
     public InhibitorArcInsertMouseStrategy inhibitorArcInsertMouseStrategy = new InhibitorArcInsertMouseStrategy(this);
 
-    private MouseInputAdapter mia = new ComponentMouseListner(this);
+    private MouseInputAdapter componentMouseListner = new ComponentMouseListner(this);
 
     public MouseStrategy currentMouseStrategy;
-    private PetriNet model = new PetriNet();
+    private PetriNet model;
 
-    public GraphPanel() {
-        model.addObserver(this);
+    public GraphPanel(PetriNet model) {
+        this.model = model;
+        this.model.addObserver(this);
         currentMouseStrategy = placeInsertMouseStrategy;
         addMouseListener(currentMouseStrategy);
         addPropertyChangeListener(MOUSE_LISTENER_CHANGED_PROPERTY, currentMouseStrategy);
@@ -66,7 +68,6 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
         super.paint(g);
     }
 
-
     public void updatePreferredSize() {
         Dimension dim = new Dimension(0, 0);
 
@@ -82,51 +83,76 @@ public class GraphPanel extends JLayeredPane implements PetriNetView {
     }
 
     public void update(Observable<PetriNet, PetriNetView, NotifyEvent<PetriNetObject>> observable, NotifyEvent<PetriNetObject> event) {
-        //TODO: dodac warstwy dla poszczegolnych obiektow
-        //TODO: zrefaktoryzwoac kod (za duzo if'ow)
-        System.out.println(event.getEventType());
-
-        if (event.getEventType() == PLACE_ADDED) {
-            Place model = event.getObject().getPlace();
-            PlaceComponent component = new PlaceComponent(model, this);
-            model.addObserver(component);
-            component.addMouseMotionListener(mia);
-            component.addMouseListener(mia);
-            add(component);
+        switch (event.getEventType()) {
+            case PLACE_ADDED:
+                _addNewPlace(event);
+                break;
+            case TRANSITION_ADDED:
+                _addNewTransition(event);
+                break;
+            case ARC_ADDED:
+                _addNewArc(event);
+                break;
+            case ARC_REMOVED:
+                remove(_findComponentByModel(event.getObject().getPetriNetObject()));
+                _setStatusText("Arc removed");
+                break;
+            case PLACE_REMOVED:
+                remove(_findComponentByModel(event.getObject().getPetriNetObject()));
+                _setStatusText("Place removed");
+                break;
+            case TRANSITION_REMOVED:
+                remove(_findComponentByModel(event.getObject().getPetriNetObject()));
+                _setStatusText("Transition removed");
+                break;
         }
-
-        if (event.getEventType() == TRANSITION_ADDED) {
-            Transition model = event.getObject().getTransition();
-            TransitionComponent component = new TransitionComponent(model, this);
-            model.addObserver(component);
-            component.addMouseMotionListener(mia);
-            component.addMouseListener(mia);
-            add(component);
-        }
-
-        if (event.getEventType() == ARC_ADDED) {
-            Arc model = event.getObject().getArc();
-            ArcComponent component = new ArcComponent(model, this);
-            model.addObserver(component);
-            component.addMouseListener(mia);
-            component.addMouseMotionListener(mia);
-            add(component);
-        }
-
-        if (event.getEventType() == PLACE_REMOVED || event.getEventType() == ARC_REMOVED || event.getEventType() == TRANSITION_REMOVED) {
-            remove(findComponentByModel(event.getObject().getPetriNetObject()));
-        }
-
         updatePreferredSize();
     }
 
-    private Component findComponentByModel(Object o) {
+    private void _addNewArc(NotifyEvent<PetriNetObject> event) {
+        Arc model = event.getObject().getArc();
+        ArcComponent component = new ArcComponent(model, this);
+        model.addObserver(component);
+        _addNewComponent(component);
+        _setStatusText(MessageFormat.format("Arc added ({0} - {1})", model.getPlace().getName(), model.getTransition().getName()));
+    }
+
+    private void _addNewTransition(NotifyEvent<PetriNetObject> event) {
+        Transition model = event.getObject().getTransition();
+        TransitionComponent component = new TransitionComponent(model, this);
+        model.addObserver(component);
+        _addNewComponent(component);
+        _setStatusText(MessageFormat.format("Transition added ({0})", model.getName()));
+    }
+
+    private void _addNewPlace(NotifyEvent<PetriNetObject> event) {
+        Place model = event.getObject().getPlace();
+        PlaceComponent component = new PlaceComponent(model, this);
+        model.addObserver(component);
+        _addNewComponent(component);
+        _setStatusText(MessageFormat.format("Place added ({0})", model.getName()));
+    }
+
+    private void _addNewComponent(PetriNetComponent component) {
+        component.addMouseMotionListener(componentMouseListner);
+        component.addMouseListener(componentMouseListner);
+        add(component);
+    }
+
+    private void _setStatusText(String msg) {
+        Application.getInstance().getMainFrame().setStatusText(msg);
+    }
+
+    private Component _findComponentByModel(Object o) {
         System.out.println("Searching for " + o);
         for (Component component : getComponents())
             if (component instanceof PetriNetComponent)
                 if (((PetriNetComponent) component).getModel() == o)
                     return component;
-        System.out.println("NOT FOUND!!!!");
         return null;
+    }
+
+    static class Strategy {
+
     }
 }

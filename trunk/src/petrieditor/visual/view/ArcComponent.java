@@ -30,7 +30,7 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
         this.model = model;
         this.graphPanel = graphPanel;
         this.arrowShape = model.getWeight() == 0 ? new InhibitorArrowShape() : new ArrowShape();
-        updateBounds();
+        _updateBounds();
         setComponentPopupMenu(new ArcComponentPopup());
     }
 
@@ -41,7 +41,7 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
     public void update(Observable<Arc, ArcView, NotifyEvent<Arc>> observable, NotifyEvent<Arc> event) {
         label.setText(String.valueOf(model.getWeight()));
         label.setLocation(getLabelPosition());
-        updateBounds();
+        _updateBounds();
         revalidate();
     }
 
@@ -57,7 +57,11 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
         return new Point(getLocation().x + bounds.width / 2, getLocation().y + bounds.height / 2);
     }
 
-    private void updateBounds() {
+    public Shape getArrowShape() {
+        return arrowShape;
+    }
+
+    private void _updateBounds() {
         if (model.getArcDirection() == Arc.ArcDirection.PLACE_TO_TRASNSITION)
             _setPlaceToTransitionArrowLocation();
         else
@@ -68,8 +72,6 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
         setBounds(bounds);
     }
 
-
-    //TODO: uporzadkowac tworzenie nowych obietkow
     private void _setPlaceToTransitionArrowLocation() {
         Point pTrans = new Point(model.getTransition().getCoords()), pPlace = new Point(model.getPlace().getCoords());
         // centrowanie punktow        
@@ -94,7 +96,7 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
 
         if (abs(pPlace.y - pTrans.y) < TransitionComponent.HEIGHT / 2)
             transX = signum(pPlace.x - pTrans.x) * TransitionComponent.WIDTH / 2;
-        
+
         if (abs(transX) > TransitionComponent.WIDTH / 2)
             transX = signum(transX) * TransitionComponent.WIDTH / 2;
 
@@ -118,10 +120,6 @@ public class ArcComponent extends PetriNetComponent implements ArcView {
         Point2D.Double placeLast = new Point2D.Double(pPlace.getX() + PLACE_RADIUS + d * dx, pPlace.getY() + PLACE_RADIUS + d * dy);
 
         arrowShape.setLocation(transFirst, placeLast);
-    }
-
-    public Shape getArrowShape() {
-        return arrowShape;
     }
 
     private class ArcComponentPopup extends JPopupMenu {
