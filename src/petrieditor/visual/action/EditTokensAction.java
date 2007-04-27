@@ -18,8 +18,11 @@ public class EditTokensAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-//        TODO:
-        String input = JOptionPane.showInputDialog("Current number of tokens: " + String.valueOf(model.getInitialMarking()));
-        model.setInitialMarking(Integer.parseInt(input));
+        String initialVal = String.valueOf(model.getInitialMarking());
+        String input = JOptionPane.showInputDialog("Current number of tokens: " + initialVal, initialVal);
+        try {
+            model.setInitialMarking(Integer.parseInt(input));
+        } catch (NumberFormatException nfe) {
+        }
     }
 }
