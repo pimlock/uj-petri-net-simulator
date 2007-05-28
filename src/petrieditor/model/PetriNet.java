@@ -8,6 +8,7 @@ import petrieditor.util.Observable;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Collections;
 
@@ -160,5 +161,40 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent<Pet
 
     public List<Transition> getTransitions() {
         return transitions;
+    }
+    
+    /**
+     * Returns the current marking of the net as a list.
+     * Order of places on the list is constant as long as no changes are made to the network.
+     * 
+     * @return ArrayList containg the current marking of the network.
+     * 
+     * @author pawel
+     */
+    public ArrayList<Integer> getNetworkMarking() {
+        ArrayList<Integer> list = new ArrayList<Integer>(places.size());
+        for (Place p : places) {
+            list.add(p.getCurrentMarking());
+        }
+        
+        return list;
+    }
+    
+    /**
+     * Sets the current marking using a given list as information source.
+     * 
+     * @param list List of Integers. Every item in the list represents marking of a single place.
+     * The order of places is the same as the one returned by getNetworkMarking()
+     * 
+     * @author pawel
+     */
+    public void setNetworkMarking(List<Integer> list) throws IllegalStateException {
+        if (list.size() != places.size()) {
+            throw new IllegalStateException("Provided marking has different size than places list");
+        }
+        Iterator<Integer> it = list.iterator();
+        for (Place p : places) {
+            p.setCurrentMarking(it.next());
+        }
     }
 }

@@ -2,6 +2,7 @@ package petrieditor.visual.view;
 
 import org.jdesktop.swingx.JXStatusBar;
 import petrieditor.model.PetriNet;
+import petrieditor.modules.treemodule.TreeModule;
 import petrieditor.visual.action.FileExitAction;
 import petrieditor.visual.action.FileLoadAction;
 import petrieditor.visual.action.FileNewAction;
@@ -126,12 +127,18 @@ public class MainFrame extends JFrame {
         modulesList.setFocusable(false);
         modulesList.setBackground(Color.WHITE);
         modulesList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(0x9297a1)));
+        
+        /// FIXME: To chyba nie tak ma wyglądać...
         modulesList.setModel(new DefaultListModel() {
             public int getSize() {
                 return 10;
             }
 
             public Object getElementAt(int index) {
+                if (index == 0) {
+                    return "tree module";
+                }
+                
                 return "element " + index;
             }
         });
@@ -140,6 +147,11 @@ public class MainFrame extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = modulesList.locationToIndex(e.getPoint());
+                    
+                    /// FIXME: A to na pewno nie ma tak wyglądać.
+                    if (index == 0) {
+                        new TreeModule().run(graphPanel.getModel());
+                    }
                     System.out.println("Double clicked on Item " + index);
                 }
             }
