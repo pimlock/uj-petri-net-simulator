@@ -36,11 +36,17 @@ public class Place extends Observable<Place, PlaceView, NotifyEvent<Place>> {
     }
 
     public void decreaseMarking(int dec) {
+        if (currentMarking == -1) {
+            return;
+        }
         currentMarking -= dec;
         setChangedAndNotifyObservers();
     }
 
     public void increaseMarking(int inc) {
+        if (currentMarking == -1) {
+            return;
+        }
         currentMarking += inc;
         setChangedAndNotifyObservers();
     }

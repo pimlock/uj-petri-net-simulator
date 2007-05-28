@@ -37,7 +37,7 @@ public class Arc extends Observable<Arc, ArcView, NotifyEvent<Arc>>  {
     }
 
     public boolean isEnabled() {
-        return place.getCurrentMarking() >= weight;
+        return place.getCurrentMarking() >= weight || place.getCurrentMarking() == -1;
     }
 
     public int getWeight() {
