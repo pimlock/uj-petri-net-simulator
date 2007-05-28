@@ -8,7 +8,7 @@ import java.util.Set;
 import petrieditor.model.Transition;
 
 /**
- * Vertex in the tree/graph
+ * Vertex in the execution tree/graph
  * 
  * @author pawel
  */
@@ -17,18 +17,32 @@ class GraphVertex {
     private GraphVertex copyOf = null;
     private HashMap<Transition, GraphVertex> exits = new HashMap<Transition, GraphVertex>();
     
+    /**
+     * Used in DFS search
+     * @author pawel
+     */
     enum Colour {
         WHITE,
         GRAY,
         BLACK
     }
-    // DFS search status
+    /**
+     * Used in DFS search.
+     */
     Colour colour = Colour.WHITE;
 
+    /**
+     * Constructs new {@link GraphVertex} using representing given marking.
+     * @param m Marking represented by newly constructed vertex.
+     */
     GraphVertex(ArrayList<Integer> m) {
         marking = m;
     }
     
+    /**
+     * Returns the marking represented this vertex.
+     * @return {@link ArrayList} of {@link Integer}s
+     */
     ArrayList<Integer> getMarking() {
         if (copyOf == null) {
             return this.marking;
@@ -37,21 +51,43 @@ class GraphVertex {
         }
     }
     
+    /**
+     * Tells whether this vertex is a copy (meaning that another vertex with same marking was already
+     * found).
+     * 
+     * @return
+     */
     boolean isCopy () {
         return copyOf != null;
     }
     
+    /**
+     * Returns the vertex of which this vertex is a copy.
+     * @return
+     */
     GraphVertex getOriginal() {
         return copyOf;
     }
     
+    /**
+     * Marks this vertex as a copy of another vertex (meaning this vertex represents a marking that was
+     * encounterered earlier in execution tree construction)
+     * 
+     * @param c
+     */
     void markAsCopyOf(GraphVertex c) {
         copyOf = c;
         marking = null;
     }
     
+    // FIXME: this does not belong here, move it to TreeModule.
+    /**
+     * Tests for inequality in markings and marks proper places with omega
+     * if neccessary
+     * 
+     * @return True iff some new omegas were found.
+     */
     boolean testAndMarkOmega(ArrayList<Integer> prevMarking) {
-        
         LinkedList<Integer> largerFields = new LinkedList<Integer>();
 
         for (int i = 0; i < prevMarking.size(); i++) {
@@ -77,7 +113,7 @@ class GraphVertex {
     }
     
     /**
-     * Adds or replaces the exit
+     * Adds or replaces an exit from this vertex (an edge in execution tree/graph)
      * @param t
      * @param v
      */
@@ -86,10 +122,19 @@ class GraphVertex {
         
     }
     
+    /**
+     * Returns a set of transitions that form edges beginning in this vertex.
+     * @return
+     */
     Set<Transition> getExitTransitions() {
         return exits.keySet();
     }
     
+    /**
+     * Returns a vertex that is directly reachable after following transition t from this vertex.
+     * @param t
+     * @return
+     */
     GraphVertex getExit(Transition t) {
         return exits.get(t);
     }
@@ -111,5 +156,21 @@ class GraphVertex {
         } else {
             return false;
         }
+    }
+    
+    @Override
+    public String toString() {
+        String repr = "[";
+        
+        for (Integer i : getMarking()) {
+            repr += (i + ", ");
+        }
+        if (isCopy()) {
+            repr += ("] (copy)");
+        } else {
+            repr += ("]");
+        }
+        
+        return repr;
     }
 }
