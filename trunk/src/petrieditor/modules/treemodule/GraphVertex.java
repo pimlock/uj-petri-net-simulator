@@ -76,8 +76,14 @@ class GraphVertex {
         return true;
     }
     
+    /**
+     * Adds or replaces the exit
+     * @param t
+     * @param v
+     */
     void addExit(Transition t, GraphVertex v) {
         exits.put(t, v);
+        
     }
     
     Set<Transition> getExitTransitions() {

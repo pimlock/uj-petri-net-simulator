@@ -2,8 +2,12 @@ package petrieditor.modules.treemodule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 
+import petrieditor.model.Arc;
+import petrieditor.model.InhibitorArc;
 import petrieditor.model.PetriNet;
 import petrieditor.model.Transition;
 import petrieditor.modules.Module;
@@ -15,10 +19,13 @@ public class TreeModule implements Module {
         return MODULE_NAME;
     }
     
-    // permanent - stores results of analysis
+    // permanent - stores results of analysis (from the last run).
+    private PetriNet petriNet = null;
     private GraphVertex rootVertex = null;
     private HashMap<ArrayList<Integer>, GraphVertex> vertices = null; // contains only "original vertices". "old vertices" are not included.
-    private PetriNet petriNet = null;
+    private boolean isBound = false;
+    private boolean deadlockFound = false;
+    
     
     //transient:
     LinkedList<ArrayList<Integer>> dfsPathMarkings = null;
@@ -27,6 +34,21 @@ public class TreeModule implements Module {
         System.out.println("Tree module");
         
         this.petriNet = petriNet;
+        this.rootVertex = null;
+        this.vertices = null;
+        this.dfsPathMarkings = null;
+        this.isBound = true;
+        this.deadlockFound = false;
+        
+        
+        for (Transition t : this.petriNet.getTransitions()) {
+            for (Arc a : t.getInputArcs()) {
+                if (a instanceof InhibitorArc) {
+                    System.err.println("Inhibitor arc found, analysis not possible");
+                    return;
+                }
+            }
+        }
         
         ArrayList<Integer> originalMarking = this.petriNet.getNetworkMarking();
         try {
@@ -39,7 +61,21 @@ public class TreeModule implements Module {
             
             dfsAnalyze(rootVertex); 
             recursiveOutput(rootVertex);
+            foldGraph();
             
+            if (isBound){
+                System.out.println("The net is bounded");
+            } else {
+                System.out.println("The net is NOT bounded");
+            }
+            
+            if (deadlockFound) {
+                System.out.println("Deadlock in the network found");
+            } else if (isBound){
+                System.out.println("No deadlocks found. The net is deadlock-free");
+            } else {
+                System.out.println("No deadlocks found, but the net is not bounded; The net MIGHT BE deadlock-free");
+            }
         } finally {
             dfsPathMarkings = null;
             this.petriNet.setNetworkMarking(originalMarking);
@@ -70,6 +106,7 @@ public class TreeModule implements Module {
                 GraphVertex newVertex = new GraphVertex(petriNet.getNetworkMarking());
                 for (ArrayList<Integer> previous: dfsPathMarkings) {
                     if (newVertex.testAndMarkOmega(previous)) {
+                        isBound = false;
                         break;
                     }
                 }
@@ -86,6 +123,9 @@ public class TreeModule implements Module {
             }
         }
         
+        if (vertex.getExitTransitions().isEmpty()) {
+            deadlockFound = true;
+        }
         
         dfsPathMarkings.removeLast();
         vertex.colour = GraphVertex.Colour.BLACK;
@@ -113,5 +153,24 @@ public class TreeModule implements Module {
             System.out.println(prefix + t.getName() + "->" );
             recursiveOutput(vertex.getExit(t), level+1);
         } 
+    }
+    
+    private void foldGraph() {
+        Iterator<ArrayList<Integer>> it = vertices.keySet().iterator();
+        while (it.hasNext()) { // for every original vertex
+            GraphVertex g = vertices.get(it.next());// fetch the vertex
+            
+            HashSet<Transition> replaces = new HashSet<Transition>();
+            
+            for (Transition t : g.getExitTransitions()) { // for every transition - find vertices to be replaced
+                if (g.getExit(t).isCopy()) {
+                    replaces.add(t);
+                }
+            }
+            
+            for (Transition t : replaces) { // replace with the vertice (second phase to avoid ConcurrentModificationException)
+                g.addExit(t, g.getExit(t).getOriginal());
+            }
+        }
     }
 }
