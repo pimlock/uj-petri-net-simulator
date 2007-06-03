@@ -189,7 +189,7 @@ public class InvariantModule implements Module {
         if(isCovered(t)) {
             html.append("<br />The net is covered by positive T-Invariants, therefore it might be bounded and live.");
         } else {
-            html.append("<br />The net is <strong>not<strong> covered by positive T-Invariants, therefore we do not know if it is bounded and live.");
+            html.append("<br />The net is <strong>not</strong> covered by positive T-Invariants, therefore we do not know if it is bounded and live.");
         }
         
         html.append("<h3> P - Invariants: </h3>");
