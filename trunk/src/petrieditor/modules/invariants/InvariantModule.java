@@ -34,14 +34,14 @@ public class InvariantModule implements Module {
         
         int[][] incidence = getIncidenceMatrix();
         
-        new PNMatrix(incidence).print(1, 0);
-        PNMatrix p = Invariants.computePInvariants(incidence);
+        new Matrix(incidence).print(1, 0);
+        Matrix p = Invariants.computePInvariants(incidence);
         System.out.println(p.getRowDimension() + " x " + p.getColumnDimension());
         if(p.getRowDimension() == 0 || p.getColumnDimension() == 0) {
             System.out.println("Brak p-niezmiennikow");
         } else p.print(1, 0);
         
-        PNMatrix t = Invariants.computeTInvariants(incidence);
+        Matrix t = Invariants.computeTInvariants(incidence);
         System.out.println(t.getRowDimension() + " x " + t.getColumnDimension());
         if(t.getRowDimension() == 0 || t.getColumnDimension() == 0) {
             System.out.println("Brak t-niezmiennikow");
@@ -111,7 +111,7 @@ public class InvariantModule implements Module {
         return incidence;
     }
     
-    private String printMatrix(PNMatrix matrix, String[] captions) {
+    private String printMatrix(Matrix matrix, String[] captions) {
         StringBuffer html = new StringBuffer();
         
         if(matrix.getRowDimension() == 0 || matrix.getColumnDimension() == 0) {
@@ -135,7 +135,7 @@ public class InvariantModule implements Module {
         return html.toString();
     }
     
-    private boolean isCovered(PNMatrix matrix) {
+    private boolean isCovered(Matrix matrix) {
         if(matrix.getColumnDimension() == 0 || matrix.getRowDimension() == 0) 
             return false;
         
@@ -149,7 +149,7 @@ public class InvariantModule implements Module {
         return true;
     }
     
-    private String printResults(int[][] incidence, PNMatrix t, PNMatrix p) {
+    private String printResults(int[][] incidence, Matrix t, Matrix p) {
         StringBuffer html = new StringBuffer();
         html.append(
             "<html><head><style type=\"text/css\">" +
@@ -207,7 +207,7 @@ public class InvariantModule implements Module {
         return html.toString();
     }
 
-    private String printEquations(PNMatrix p, String[] placesNames) {
+    private String printEquations(Matrix p, String[] placesNames) {
         StringBuffer html = new StringBuffer();
         html.append("<br /><h4>Net equations:</h4>");
         

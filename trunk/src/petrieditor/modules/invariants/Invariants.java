@@ -7,12 +7,12 @@ import java.util.Vector;
  * @author Piotr M³ocek
  */
 public class Invariants {
-    public static void testPInvariants(int m[][], PNMatrix inv) {
-        test(new PNMatrix(m).transpose(), inv);
+    public static void testPInvariants(int m[][], Matrix inv) {
+        test(new Matrix(m).transpose(), inv);
     }
     
-    public static void testTInvariants(int m[][], PNMatrix inv) {
-        test(new PNMatrix(m), inv);
+    public static void testTInvariants(int m[][], Matrix inv) {
+        test(new Matrix(m), inv);
     }
     
     /**
@@ -21,22 +21,22 @@ public class Invariants {
      * @param incidence macierz incydencji sieci
      * @param invariants macierz, ktorej kolumny sa niezmiennikami sieci
      */
-    public static void test(PNMatrix incidence, PNMatrix invariants) {
+    public static void test(Matrix incidence, Matrix invariants) {
         for(int a = 0; a < invariants.getColumnDimension(); a++) {
-            PNMatrix i = invariants.getMatrix(0, invariants.getRowDimension()-1, a, a);
+            Matrix i = invariants.getMatrix(0, invariants.getRowDimension()-1, a, a);
             
-            PNMatrix r = incidence.mul(incidence,i);
+            Matrix r = incidence.mul(incidence,i);
             if( r.isZeroMatrix() ) System.out.println(a + ":OK");
             else System.out.println(a + ":Error");
         }
     }
     
-    public static PNMatrix computePInvariants(int m[][]) {
-        return compute(PNMatrix.constructWithCopy(m));
+    public static Matrix computePInvariants(int m[][]) {
+        return compute(Matrix.constructWithCopy(m));
     }
     
-    public static PNMatrix computeTInvariants(int m[][]) {
-        return compute(PNMatrix.constructWithCopy(m).transpose());
+    public static Matrix computeTInvariants(int m[][]) {
+        return compute(Matrix.constructWithCopy(m).transpose());
     }
     
     /**
@@ -105,10 +105,10 @@ public class Invariants {
      * @param incidence macierz incydencji sieci
      * @return macierz, ktorej kolumny sa kolejnymi niezmiennikami
      */
-    private static PNMatrix compute(PNMatrix incidence) {        
+    private static Matrix compute(Matrix incidence) {        
         int rows = incidence.getRowDimension(), cols = incidence.getColumnDimension();
         // na poczatku baza jest macierz jednostkowa
-        PNMatrix basis = PNMatrix.identity(rows, rows);
+        Matrix basis = Matrix.identity(rows, rows);
         
         int row = 0, pivot = 0;
         
@@ -175,7 +175,7 @@ public class Invariants {
             if(!isNonZero(incidence.getRow(i)))
                 ++inv;
         
-        PNMatrix nbasis = new PNMatrix( inv, rows );
+        Matrix nbasis = new Matrix( inv, rows );
         inv = 0;
         for( int i=0; i<rows; i++ )
             if(!isNonZero(incidence.getRow(i)))
@@ -195,7 +195,7 @@ public class Invariants {
     }
     
     
-    private static PNMatrix deleteNotReducableRows( PNMatrix basis ) {
+    private static Matrix deleteNotReducableRows( Matrix basis ) {
         int row = 0, pivot = 0;
         int rows = basis.getRowDimension(), cols = basis.getColumnDimension();
         
@@ -272,7 +272,7 @@ public class Invariants {
         return true;
     }
     
-    private static PNMatrix getPositive(PNMatrix BB) {
+    private static Matrix getPositive(Matrix BB) {
         int rows = BB.getRowDimension(), cols = BB.getColumnDimension();
         
         Vector< int[] > S = new Vector<int[]>(), B = new Vector<int[]>();
@@ -327,7 +327,7 @@ public class Invariants {
             S = NS; B = NB;
             ++j;
         }
-        PNMatrix basis = new PNMatrix(B.size(), cols);
+        Matrix basis = new Matrix(B.size(), cols);
         for(int i = 0; i < B.size(); ++i)
             basis.setRow(i, B.get(i));
         
