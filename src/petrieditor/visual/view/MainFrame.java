@@ -2,6 +2,7 @@ package petrieditor.visual.view;
 
 import org.jdesktop.swingx.JXStatusBar;
 import petrieditor.model.PetriNet;
+import petrieditor.modules.invariants.InvariantModule;
 import petrieditor.modules.treemodule.TreeModule;
 import petrieditor.visual.action.FileExitAction;
 import petrieditor.visual.action.FileLoadAction;
@@ -138,6 +139,9 @@ public class MainFrame extends JFrame {
                 if (index == 0) {
                     return "tree module";
                 }
+                else if (index == 1) {
+                    return "Invariants module";
+                }
                 
                 return "element " + index;
             }
@@ -151,6 +155,9 @@ public class MainFrame extends JFrame {
                     /// FIXME: A to na pewno nie ma tak wyglądać.
                     if (index == 0) {
                         new TreeModule().run(graphPanel.getModel());
+                    }
+                    else if (index == 1) {
+                        new InvariantModule().run(graphPanel.getModel());
                     }
                     System.out.println("Double clicked on Item " + index);
                 }

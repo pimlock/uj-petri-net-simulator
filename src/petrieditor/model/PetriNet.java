@@ -163,6 +163,10 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent<Pet
         return transitions;
     }
     
+    public List<Place> getPlaces() {
+        return places;
+    }
+    
     /**
      * Returns the current marking of the net as a list.
      * Order of places on the list is constant as long as no changes are made to the network.
