@@ -1,22 +1,21 @@
 package petrieditor.modules.invariants;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import petrieditor.model.Arc;
+import petrieditor.model.PetriNet;
+import petrieditor.model.Place;
+import petrieditor.model.Transition;
+import petrieditor.modules.HTMLResultPane;
+import petrieditor.modules.Module;
+import petrieditor.modules.ResultPane;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
-import javax.swing.border.BevelBorder;
-import petrieditor.model.*;
-import petrieditor.modules.Module;
 
 /**
- * @author Piotr M³ocek
+ * @author Piotr Mï¿½ocek
  */
 public class InvariantModule implements Module {
     private static final String MODULE_NAME = "Invariant module";
@@ -29,7 +28,7 @@ public class InvariantModule implements Module {
         return MODULE_NAME;
     }
 
-    public void run(PetriNet petriNet) {  
+    public ResultPane run(PetriNet petriNet) {  
         this.petriNet = petriNet;
         
         int[][] incidence = getIncidenceMatrix();
@@ -64,7 +63,9 @@ public class InvariantModule implements Module {
         results.setText(printResults(incidence, t, p));
         
         frame.pack();
-        frame.setVisible(true);
+        //frame.setVisible(true);
+
+        return new HTMLResultPane(printResults(incidence, t, p)); 
     }
     
     private int[][] getIncidenceMatrix() {

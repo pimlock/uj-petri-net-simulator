@@ -11,7 +11,7 @@ public class MyModule implements Module {
     }
 
 
-    public void run(PetriNet petriNet) {
+    public ResultPane run(PetriNet petriNet) {
 
         // wykonuje jakies obliczenia na modelu petriNet
 
@@ -19,5 +19,6 @@ public class MyModule implements Module {
         // bo pewnie docelowo bedzie tak, ze modul bedzie wyswietlac rezultaty
         // w postaci HTML, ale musze jeszcze pomyslec, jak to graficznie bedzie wygladac
 
+        return null;
     }
 }
