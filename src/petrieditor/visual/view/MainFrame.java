@@ -2,8 +2,8 @@ package petrieditor.visual.view;
 
 import org.jdesktop.swingx.JXStatusBar;
 import petrieditor.model.PetriNet;
-import petrieditor.modules.invariants.InvariantModule;
-import petrieditor.modules.treemodule.TreeModule;
+import petrieditor.modules.Module;
+import petrieditor.modules.ModuleFinder;
 import petrieditor.visual.action.FileExitAction;
 import petrieditor.visual.action.FileLoadAction;
 import petrieditor.visual.action.FileNewAction;
@@ -91,9 +91,9 @@ public class MainFrame extends JFrame {
         load.setMnemonic(KeyEvent.VK_O);
         load.addActionListener(new FileLoadAction());
 
-        JMenuItem save = new JMenuItem("Save", new ImageIcon(getClass().getResource("../resources/save.png")));
-        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-        save.setMnemonic(KeyEvent.VK_S);
+//        JMenuItem save = new JMenuItem("Save", new ImageIcon(getClass().getResource("../resources/save.png")));
+//        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+//        save.setMnemonic(KeyEvent.VK_S);
 
         JMenuItem saveAs = new JMenuItem("Save as...", new ImageIcon(getClass().getResource("../resources/save_as.png")));
         saveAs.addActionListener(new FileSaveAsAction());
@@ -105,7 +105,7 @@ public class MainFrame extends JFrame {
 
         file.add(newFile);
         file.add(load);
-        file.add(save);
+//        file.add(save);
         file.add(saveAs);
         file.addSeparator();
         file.add(exit);
@@ -128,22 +128,17 @@ public class MainFrame extends JFrame {
         modulesList.setFocusable(false);
         modulesList.setBackground(Color.WHITE);
         modulesList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(0x9297a1)));
-        
-        /// FIXME: To chyba nie tak ma wyglądać...
+
+        final java.util.List<Class> modules = ModuleFinder.getModules();
+        final java.util.List<String> modulesName = ModuleFinder.getModulesName();
+
         modulesList.setModel(new DefaultListModel() {
             public int getSize() {
-                return 10;
+                return modules.size();
             }
 
             public Object getElementAt(int index) {
-                if (index == 0) {
-                    return "tree module";
-                }
-                else if (index == 1) {
-                    return "Invariants module";
-                }
-                
-                return "element " + index;
+                return modulesName.get(index);
             }
         });
         modulesList.setCellRenderer(new MyCellRenderer());
@@ -151,15 +146,18 @@ public class MainFrame extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = modulesList.locationToIndex(e.getPoint());
-                    
-                    /// FIXME: A to na pewno nie ma tak wyglądać.
-                    if (index == 0) {
-                        new TreeModule().run(graphPanel.getModel());
+                                     
+                    JFrame newFrame = new JFrame(modulesName.get(index));
+                    try {
+                        newFrame.setContentPane(new ModuleRunnerPanel((Module) modules.get(index).newInstance()));
+                    } catch (Exception exc) {
+                        exc.printStackTrace();
                     }
-                    else if (index == 1) {
-                        new InvariantModule().run(graphPanel.getModel());
-                    }
-                    System.out.println("Double clicked on Item " + index);
+
+                    newFrame.setSize(new Dimension(350, 400));
+                    newFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                    newFrame.setLocationRelativeTo(MainFrame.this);
+                    newFrame.setVisible(true);
                 }
             }
         });

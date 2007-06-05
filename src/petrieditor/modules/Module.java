@@ -19,6 +19,7 @@ public interface Module {
      * Odpala modul, ktory wykonuje obliczenia na podstawie modelu sieci Petriego.
      *
      * @param petriNet Model sieci Petriego, na ktorym modul bedzie operowac.
+     * @return Zwraca rezultat.
      */
-    public void run(PetriNet petriNet);
+    public ResultPane run(PetriNet petriNet);
 }

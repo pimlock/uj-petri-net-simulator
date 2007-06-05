@@ -44,4 +44,25 @@ public class IOHelper {
         return ret;
     }
 
+    public static PetriNet cloneBySerializing(PetriNet petriNet) {
+        PetriNet ret = null;
+        
+        StringWriter stringWriter = new StringWriter();
+
+        try {
+            ObjectOutputStream out = new XStream(new DomDriver()).createObjectOutputStream(stringWriter);
+            out.writeObject(petriNet);
+            out.flush();
+            out.close();
+
+            ObjectInputStream in = new XStream(new DomDriver()).createObjectInputStream(new StringReader(stringWriter.toString()));
+            ret = (PetriNet) in.readObject();
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();  
+        }
+
+        return ret;
+    }
+
 }

@@ -1,16 +1,13 @@
 package petrieditor.modules.treemodule;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import petrieditor.model.Arc;
 import petrieditor.model.InhibitorArc;
 import petrieditor.model.PetriNet;
 import petrieditor.model.Transition;
 import petrieditor.modules.Module;
+import petrieditor.modules.ResultPane;
+
+import java.util.*;
 
 
 /**
@@ -19,7 +16,7 @@ import petrieditor.modules.Module;
  * @author pawel
  */
 public class TreeModule implements Module {
-    private static final String MODULE_NAME = "Tree and graph module";
+    private static final String MODULE_NAME = "Tree and graph";
 
     /**
      * Returns the module name.
@@ -41,7 +38,7 @@ public class TreeModule implements Module {
      * 
      * @warning Temporarily tampers with the net, but restores its state afterwards.
      */
-    synchronized public void run(PetriNet petriNet) {
+    synchronized public ResultPane run(PetriNet petriNet) {
         System.out.println("Tree module");
         
         this.petriNet = petriNet;
@@ -55,7 +52,7 @@ public class TreeModule implements Module {
             for (Arc a : t.getInputArcs()) {
                 if (a instanceof InhibitorArc) {
                     System.err.println("Inhibitor arc found, analysis not possible");
-                    return;
+                    return null;
                 }
             }
         }
@@ -95,6 +92,7 @@ public class TreeModule implements Module {
         } finally {
             this.petriNet.setNetworkMarking(originalMarking);
         }
+        return null;
     }
     
     /**
