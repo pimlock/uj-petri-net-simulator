@@ -1,8 +1,9 @@
 package petrieditor.visual.view;
 
 import net.java.swingfx.waitwithstyle.PerformanceInfiniteProgressPanel;
-import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.StackLayout;
+import org.jdesktop.swingx.JXErrorPane;
+import org.jdesktop.swingx.error.ErrorInfo;
 import petrieditor.io.IOHelper;
 import petrieditor.model.PetriNet;
 import petrieditor.modules.Module;
@@ -31,29 +32,7 @@ public class ModuleRunnerPanel extends Container {
     private class InnerPanel extends JPanel {
         public InnerPanel() {
             JButton runButton = new JButton("Run");
-            runButton.addActionListener(new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    JRootPane rootPane = getRootPane();
-                    Component oldGlassPane = rootPane.getGlassPane();
-                    PerformanceInfiniteProgressPanel pane = new PerformanceInfiniteProgressPanel();
-                    rootPane.setGlassPane(pane);
-                    pane.setVisible(true);
-                    PetriNet petriNet = IOHelper.cloneBySerializing(Application.getInstance().getCurrentGraphPanel().getModel());
-
-                    ResultPane resultPane = null;
-                    try {                       
-                        resultPane = module.run(petriNet);
-                    } catch (Exception exc) {                        
-                        JXErrorPane.showDialog(exc);
-                    } finally {
-                        pane.setVisible(false);
-                        rootPane.setGlassPane(oldGlassPane);
-                    }
-
-                    if (resultPane != null)
-                        rootPane.setContentPane(resultPane);
-                }
-            });
+            runButton.addActionListener(new RunAction());
             GroupLayout layout = new javax.swing.GroupLayout(this);
             setLayout(layout);
             layout.setHorizontalGroup(
@@ -70,6 +49,43 @@ public class ModuleRunnerPanel extends Container {
                             .addComponent(runButton)
                             .addContainerGap(231, Short.MAX_VALUE))
             );
+        }
+
+        private class RunAction extends AbstractAction {
+            public void actionPerformed(ActionEvent e) {
+                final JRootPane rootPane = getRootPane();
+                final Component oldGlassPane = rootPane.getGlassPane();
+                final PerformanceInfiniteProgressPanel pane = new PerformanceInfiniteProgressPanel();
+                rootPane.setGlassPane(pane);
+                pane.setVisible(true);
+
+                new SwingWorker<ResultPane, Object>() {
+                    protected ResultPane doInBackground() throws Exception {
+                        PetriNet petriNet = IOHelper.cloneBySerializing(Application.getInstance().getCurrentGraphPanel().getModel());
+
+                        ResultPane resultPane = null;
+                        try {
+                            //Thread.sleep(1000);
+                            resultPane = module.run(petriNet);
+                        } catch (Exception exc) {
+                            JXErrorPane.showDialog(null, new ErrorInfo("Exception happened :(", exc.getClass().getName(), null, null, exc, null, null));
+                            exc.printStackTrace();
+                        }
+
+                        return resultPane;
+                    }
+
+                    protected void done() {
+                        pane.setVisible(false);
+                        rootPane.setGlassPane(oldGlassPane);
+                        try {
+                            if (get() != null)
+                                rootPane.setContentPane(get());
+                        } catch (Exception ignore) {
+                        }
+                    }
+                }.execute();
+            }
         }
     }
 }
