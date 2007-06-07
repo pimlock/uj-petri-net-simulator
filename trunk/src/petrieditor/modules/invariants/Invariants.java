@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 /**
- * @author Piotr M³ocek
+ * @author Piotr MÅ‚ocek
  */
 public class Invariants {
     public static void testPInvariants(int m[][], Matrix inv) {
@@ -147,7 +147,7 @@ public class Invariants {
                         int l1[] = incidence.getRowCopy(k);
                         int l2[] = basis.getRowCopy(k);
                         
-                        // redukcja kolumn przez najwiekszy wspolny dzielnik, aby nie by³o przepe³nienia
+                        // redukcja kolumn przez najwiekszy wspolny dzielnik, aby nie byÅ‚o przepeï¿½nienia
                         int fat1 = reduceByGcd(l1);
                         int fat2 = reduceByGcd(l2);
                         
