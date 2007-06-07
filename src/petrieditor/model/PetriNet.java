@@ -26,10 +26,16 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent<Pet
     private int nextPlaceNumber = 0, nextTransitionNumber = 0;
 
     public void addNewPlace(Point coords) {
-        Place newPlace = new Place(coords, "P" + nextPlaceNumber++);
+        addNewPlace(coords, "P" + nextPlaceNumber);
+    }
+    
+    public Place addNewPlace(Point coords, String name) {
+        Place newPlace = new Place(coords, name);
+        nextPlaceNumber++;
         places.add(newPlace);
         setChanged();
         notifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newPlace), EventType.PLACE_ADDED));
+        return newPlace;
     }
 
     public void removePlace(Place place) {
@@ -52,9 +58,15 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent<Pet
     }
 
     public void addNewTransition(Point coords) {
-        Transition newTransition = new Transition(coords, "T" + nextTransitionNumber++);
+        addNewTransition(coords, "T" + nextTransitionNumber);
+    }
+    
+    public Transition addNewTransition(Point coords, String name) {
+        Transition newTransition = new Transition(coords, name);
+        nextTransitionNumber++;
         transitions.add(newTransition);
-        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newTransition), EventType.TRANSITION_ADDED));
+        setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newTransition), EventType.TRANSITION_ADDED));        
+        return newTransition;
     }
 
     public void removeTransition(Transition transition) {
@@ -77,18 +89,28 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent<Pet
     }
 
     public void connectWithArc(Place fromPlace, Transition toTransition) {
+        connectWithArc(fromPlace, toTransition, 1);
+    }
+    
+    public void connectWithArc(Place fromPlace, Transition toTransition, int weight) {
         if (fromPlace.hasOutputArcToTransition(toTransition))
             return;
         Arc newArc = new Arc(fromPlace, toTransition);
+        newArc.setWeight(weight);
         arcs.add(newArc);
         setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newArc), EventType.ARC_ADDED));
     }
 
     public void connectWithArc(Transition fromTransition, Place toPlace) {
+        connectWithArc(fromTransition, toPlace, 1);
+    }
+    
+    public void connectWithArc(Transition fromTransition, Place toPlace, int weight) {
         if (toPlace.hasInputArcFromTransition(fromTransition))
             return;
         Arc newArc = new Arc(fromTransition, toPlace);
-        arcs.add(newArc);
+        newArc.setWeight(weight);
+        arcs.add(newArc);        
         setChangedAndNotifyObservers(new NotifyEvent<PetriNetObject>(new PetriNetObject(newArc), EventType.ARC_ADDED));
     }
 
@@ -154,9 +176,9 @@ public class PetriNet extends Observable<PetriNet, PetriNetView, NotifyEvent<Pet
         if (enabledTransitions.size() == 0)
             throw new IllegalStateException("No enabled transitions!");
 
-        Collections.shuffle(transitions);
+        Collections.shuffle(enabledTransitions);
 
-        transitions.get(0).fire();
+        enabledTransitions.get(0).fire();
     }
 
     public List<Transition> getTransitions() {

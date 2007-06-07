@@ -8,6 +8,7 @@ import petrieditor.visual.action.FileExitAction;
 import petrieditor.visual.action.FileLoadAction;
 import petrieditor.visual.action.FileNewAction;
 import petrieditor.visual.action.FileSaveAsAction;
+import petrieditor.visual.action.ImportFromPipeAction;
 import petrieditor.visual.util.GradientPanel;
 import petrieditor.visual.util.StackLayout;
 
@@ -15,6 +16,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.MessageFormat;
+
 
 /**
  * @author wiktor
@@ -90,6 +92,12 @@ public class MainFrame extends JFrame {
         load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         load.setMnemonic(KeyEvent.VK_O);
         load.addActionListener(new FileLoadAction());
+        
+        JMenuItem importFromPipe = new JMenuItem("Import from PIPE...");
+        importFromPipe.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, ActionEvent.CTRL_MASK));
+        importFromPipe.setMnemonic(KeyEvent.VK_I);
+        importFromPipe.addActionListener(new ImportFromPipeAction());
+
 
 //        JMenuItem save = new JMenuItem("Save", new ImageIcon(getClass().getResource("../resources/save.png")));
 //        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
@@ -107,6 +115,8 @@ public class MainFrame extends JFrame {
         file.add(load);
 //        file.add(save);
         file.add(saveAs);
+        file.addSeparator();
+        file.add(importFromPipe);
         file.addSeparator();
         file.add(exit);
 
