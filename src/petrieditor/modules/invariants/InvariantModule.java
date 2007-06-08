@@ -33,38 +33,22 @@ public class InvariantModule implements Module {
         
         int[][] incidence = getIncidenceMatrix();
         
-        new Matrix(incidence).print(1, 0);
+        // new Matrix(incidence).print(1, 0);
+        
         Matrix p = Invariants.computePInvariants(incidence);
+        /*
         System.out.println(p.getRowDimension() + " x " + p.getColumnDimension());
         if(p.getRowDimension() == 0 || p.getColumnDimension() == 0) {
             System.out.println("Brak p-niezmiennikow");
         } else p.print(1, 0);
-        
+        */
         Matrix t = Invariants.computeTInvariants(incidence);
+        /*
         System.out.println(t.getRowDimension() + " x " + t.getColumnDimension());
         if(t.getRowDimension() == 0 || t.getColumnDimension() == 0) {
             System.out.println("Brak t-niezmiennikow");
         } else t.print(1, 0);
-        
-        JFrame frame = new JFrame("Invariants");
-        frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-        frame.setLayout(new GridLayout(1, 1));
-        
-        JEditorPane results = new JEditorPane();
-        results.setEditable(false);
-        results.setMargin(new Insets(5,5,5,5));
-        results.setContentType("text/html");
-        
-        JScrollPane scroller=new JScrollPane(results);
-        scroller.setPreferredSize(new Dimension(400,300));
-
-        frame.add(scroller);
-        
-        results.setText(printResults(incidence, t, p));
-        
-        frame.pack();
-        //frame.setVisible(true);
-
+        */
         return new HTMLResultPane(printResults(incidence, t, p)); 
     }
     
@@ -168,15 +152,15 @@ public class InvariantModule implements Module {
         html.append("<table border=\"1\" cellspacing=\"1\"><tr><td>&nbsp;</td>");
         
         for(int i = 0; i < transitionsNames.length; ++i) {
-            html.append("<td class=\"rowhead\">"+transitionsNames[i]+"</td>");
+            html.append("<td class=\"rowhead\">" + transitionsNames[i] + "</td>");
         }
         
         html.append("</tr>");
         for(int i = 0; i < incidence.length; ++i) {
-            html.append("<tr class=\"" + (((i%2)==1)?"odd":"even") + "\"><td class=\"colhead\">" + placesNames[i] + "</td>");
+            html.append("<tr class=\"" + ( ( (i % 2) == 1 ) ? "odd" : "even") + "\"><td class=\"colhead\">" + placesNames[i] + "</td>");
             
             for(int j = 0; j < incidence[i].length; ++j) {
-                html.append("<td class=\"cell\">"+incidence[i][j]+"</td>");
+                html.append("<td class=\"cell\">" + incidence[i][j] + "</td>");
             }
             
             html.append("</tr>");
@@ -229,11 +213,12 @@ public class InvariantModule implements Module {
                 int number = 0;
                 for(int j = 0; j < p.getRowDimension(); ++j) {
                     if((number = p.get(j, i)) != 0) {
-                        html.append((first?"":" + ") + number + " * M(" + placesNames[j] + ")");
+                        html.append( (first ? "" : " + ") + number + " * M(" + placesNames[j] + ")");
+                        first = false;
                         tokens += number * placeToTokenCount.get(places[j]);
                     }
                 }
-                html.append(" = "+tokens+"</br>");
+                html.append(" = " + tokens + "</br>");
                 
             }
         }
