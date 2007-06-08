@@ -1,5 +1,6 @@
 package petrieditor.modules;
 
+import petrieditor.modules.controllability.ControllabilityModule;
 import petrieditor.modules.invariants.InvariantModule;
 import petrieditor.modules.treemodule.TreeModule;
 
@@ -25,9 +26,12 @@ public class ModuleFinder {
 
         registredModules.add(TreeModule.class);
         registredModulesName.add(new TreeModule().getName());
+
+        registredModules.add(ControllabilityModule.class);
+        registredModulesName.add(new ControllabilityModule().getName());
     }
-    
-    public static List<Class> getModules() {        
+
+    public static List<Class> getModules() {
         return registredModules;
     }
 
