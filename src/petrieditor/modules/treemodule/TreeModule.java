@@ -47,7 +47,7 @@ public class TreeModule implements Module {
         }
         
         dfsTreeConstruction(resultSet, resultSet.rootVertex); 
-        foldGraph(resultSet);
+        //foldGraph(resultSet);
         
         if (resultSet.isBounded) {
             stronglyConnectedComponents(resultSet);
@@ -121,6 +121,8 @@ public class TreeModule implements Module {
     
     /**
      * Folds the tree into a graph (by removing old/copy vertices).
+     * 
+     * unused currently, but correct and tested.
      */
     private void foldGraph(TreeModuleResultSet resultSet) {
         Iterator<ArrayList<Integer>> it = resultSet.vertices.keySet().iterator();
@@ -155,7 +157,7 @@ public class TreeModule implements Module {
             GraphVertex from = transposed.get(arrlist);
             GraphVertex originalFrom = resultSet.vertices.get(arrlist);
             for (Transition t : originalFrom.getExitTransitions()) {
-                GraphVertex to = transposed.get(originalFrom.getExit(t).getMarking());
+                GraphVertex to = transposed.get(originalFrom.getExit(t).getPrimaryVertex().getMarking());
                 to.addExit(t, from);
             }
         }
@@ -200,7 +202,7 @@ public class TreeModule implements Module {
         gv.colour = GraphVertex.Colour.GRAY;
         
         for (Transition t : gv.getExitTransitions()) {
-            GraphVertex newVertex = gv.getExit(t);
+            GraphVertex newVertex = gv.getExit(t).getPrimaryVertex();
             dfsTimestamping(newVertex, visitTimes);
         }
         visitTimes.addFirst(gv.getMarking());
@@ -224,7 +226,7 @@ public class TreeModule implements Module {
         sssnumbers.put(vertex.getMarking(), sssid);
         
         for (Transition t : vertex.getExitTransitions()) {
-            GraphVertex newVertex = vertex.getExit(t);
+            GraphVertex newVertex = vertex.getExit(t).getPrimaryVertex();
             dfsDoSSC(newVertex, sssnumbers, sssid);
         }
         
