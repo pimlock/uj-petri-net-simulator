@@ -2,6 +2,7 @@ package petrieditor.modules.treemodule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -186,8 +187,18 @@ class GraphVertex {
     public String toString() {
         String repr = "[";
         
+        boolean first = true;
+        
         for (Integer i : getMarking()) {
-            repr += (i + ", ");
+            if (!first) {
+                repr += ", ";
+            }
+            first = false;
+            if (i < 0) {
+                repr += "&omega;";
+            } else {
+                repr += i;
+            }
         }
         if (isCopy()) {
             repr += ("] (copy)");
