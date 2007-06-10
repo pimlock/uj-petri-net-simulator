@@ -6,6 +6,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import petrieditor.model.Transition;
 import petrieditor.modules.ResultPane;
 
 public class TreeModuleResultPane extends ResultPane {
@@ -49,25 +50,9 @@ public class TreeModuleResultPane extends ResultPane {
             text += "<p>No deadlocks in the network found. As it is not bounded this means it " + getGreenText("MIGHT BE deadlock-free") + "</p>";
         }
 
-        /*
-        private void recursiveOutput(GraphVertex vertex) {
-            recursiveOutput(vertex, 0);
-        }
         
-        private void recursiveOutput(GraphVertex vertex, int level) {
-            String prefix = "";
-            for(int i =0; i< level; i++) {
-                prefix = prefix + "    ";
-            }
-            System.out.println(prefix + vertex);
-            
-            for (Transition t : vertex.getExitTransitions()) {
-                System.out.println(prefix + t.getName() + "->" );
-                recursiveOutput(vertex.getExit(t), level+1);
-            } 
-        }*/
-        
-        
+        text += recursiveOutput(resultSet.rootVertex);
+        System.out.println(recursiveOutput(resultSet.rootVertex));
         text += "</body></html>";
         
         return text;
@@ -79,5 +64,27 @@ public class TreeModuleResultPane extends ResultPane {
     
     String getRedText(String text) {
         return "<span style='color:red; font-weight:bold'>"+text+"</span>";
+    }
+    
+    String recursiveOutput(GraphVertex vertex) {
+        return recursiveOutput(vertex, null);
+    }
+    
+    String recursiveOutput(GraphVertex vertex, String reachedBy) {
+        String text = "<li>"+vertex;
+        if (reachedBy != null) {
+            text += "(by " +reachedBy + ")";
+        }
+        if (!vertex.getExitTransitions().isEmpty()) {
+            text += "<ul>";
+            for (Transition t : vertex.getExitTransitions()) {
+                text+=recursiveOutput(vertex.getExit(t), t.getName());
+            } 
+            text += "</ul>";
+        }
+        
+        text += "</li>";
+        
+        return text;
     }
 }

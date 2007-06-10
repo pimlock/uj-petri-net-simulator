@@ -39,4 +39,5 @@ class TreeModuleResultSet {
         rootVertex = new GraphVertex(petriNet.getNetworkMarking());
         vertices.put(rootVertex.getMarking(), rootVertex);
     }
+    
 }

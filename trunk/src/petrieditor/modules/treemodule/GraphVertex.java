@@ -82,6 +82,18 @@ class GraphVertex {
     }
     
     /**
+     * Returns original vertex if this is a copy, returns this vertex otherwise
+     * @return 
+     */
+    GraphVertex getPrimaryVertex() {
+        if (getOriginal() == null) {
+            return this;
+        } else {
+            return getOriginal();
+        }
+    }
+    
+    /**
      * Marks this vertex as a copy of another vertex (meaning this vertex represents a marking that was
      * encounterered earlier in execution tree construction)
      * 
