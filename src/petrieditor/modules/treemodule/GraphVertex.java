@@ -13,8 +13,20 @@ import petrieditor.model.Transition;
  * @author pawel
  */
 class GraphVertex {
+    /**
+     * Marking represented by this vertex
+     */
     private ArrayList<Integer> marking;
+    
+    /**
+     * If this vertex is a copy of another vertex (same marking reached by another path)
+     * then this is the "original" vertex.
+     */
     private GraphVertex copyOf = null;
+    
+    /**
+     * Exits from this vertex. 
+     */
     private HashMap<Transition, GraphVertex> exits = new HashMap<Transition, GraphVertex>();
     
     /**
