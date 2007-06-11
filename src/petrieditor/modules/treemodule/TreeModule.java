@@ -54,11 +54,7 @@ public class TreeModule implements Module {
         }
         
         dfsTreeConstruction(resultSet, resultSet.rootVertex); 
-
-        if (resultSet.reachableTransitions.size() == resultSet.petriNet.getTransitions().size()) {
-            resultSet.allTransitionsReachable = true;
-        }
-        
+       
         if (resultSet.isBounded) {
             stronglyConnectedComponents(resultSet);
         }
@@ -174,56 +170,6 @@ public class TreeModule implements Module {
         transposed = null;
         visitTimes = null;
         resultSet.stronglyConnectedComponentsCount = sssId;
-
-        if (resultSet.isBounded && resultSet.allTransitionsReachable) { // got L1, seeking for higher
-            if (resultSet.stronglyConnectedComponentsCount == 1) { // got L4
-                resultSet.allTransitionsInOneSSC = resultSet.everyTransitionIsSomeSSC = true;
-            } else {
-                /**
-                 * This might be unnecessary if I prove that:
-                 *  - without inhibitor arcs
-                 *  - for bounded net.
-                 *  
-                 *  L3 == L4
-                 */
-                
-                SSComponent[] components = new SSComponent[sssId];
-                for (int i =0; i< sssId; i++) {
-                    components[i] =  new SSComponent();
-                }
-                for (ArrayList<Integer> state : sssnumbers.keySet()) {
-                    int sscnumber = sssnumbers.get(state);
-                    for (Transition t : resultSet.vertices.get(state).getExitTransitions()) {
-                        ArrayList<Integer> targetState = resultSet.vertices.get(state).getExit(t).getMarking();
-                        int targetsscnumber = sssnumbers.get(targetState);
-                        if (sscnumber == targetsscnumber) {
-                            components[sscnumber].innerTransitions.add(t);
-                        } 
-                    }
-                }
-                
-                // got tree of scc components
-                
-                for (int i = 0; i< components.length; i++) {
-                    if (components[i].innerTransitions.size() == resultSet.petriNet.getTransitions().size()) {
-                        resultSet.allTransitionsInOneSSC = true;
-                        break;
-                    }
-                }
-                
-                if (!resultSet.allTransitionsInOneSSC) {
-                    HashSet<Transition> inSomeSCC = new HashSet<Transition>();
-                    for (int i = 0; i< components.length; i++) {
-                        inSomeSCC.addAll(components[i].innerTransitions);
-                        if (inSomeSCC.size() == resultSet.petriNet.getTransitions().size()) {
-                            resultSet.everyTransitionIsSomeSSC = true;
-                            break;
-                        }
-                    }
-                }
-                
-            }
-        }
     }
 
     /**
