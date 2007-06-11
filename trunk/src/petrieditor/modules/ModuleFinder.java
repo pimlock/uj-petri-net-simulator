@@ -2,6 +2,7 @@ package petrieditor.modules;
 
 import petrieditor.modules.controllability.ControllabilityModule;
 import petrieditor.modules.invariants.InvariantModule;
+import petrieditor.modules.simulation.SimulationModule;
 import petrieditor.modules.treemodule.TreeModule;
 
 import java.util.List;
@@ -29,6 +30,9 @@ public class ModuleFinder {
 
         registredModules.add(ControllabilityModule.class);
         registredModulesName.add(new ControllabilityModule().getName());
+        
+        registredModules.add(SimulationModule.class);
+        registredModulesName.add(new SimulationModule().getName());        
     }
 
     public static List<Class> getModules() {

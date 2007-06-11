@@ -23,6 +23,8 @@ public class InvariantModule implements Module {
     private Place[] places;
     private String[] transitionsNames;
     private PetriNet petriNet;
+    private Matrix p;
+    private Matrix t;
     
     public String getName() {
         return MODULE_NAME;
@@ -35,14 +37,14 @@ public class InvariantModule implements Module {
         
         // new Matrix(incidence).print(1, 0);
         
-        Matrix p = Invariants.computePInvariants(incidence);
+        p = Invariants.computePInvariants(incidence);
         /*
         System.out.println(p.getRowDimension() + " x " + p.getColumnDimension());
         if(p.getRowDimension() == 0 || p.getColumnDimension() == 0) {
             System.out.println("Brak p-niezmiennikow");
         } else p.print(1, 0);
         */
-        Matrix t = Invariants.computeTInvariants(incidence);
+        t = Invariants.computeTInvariants(incidence);
         /*
         System.out.println(t.getRowDimension() + " x " + t.getColumnDimension());
         if(t.getRowDimension() == 0 || t.getColumnDimension() == 0) {
@@ -51,6 +53,18 @@ public class InvariantModule implements Module {
         */
         return new HTMLResultPane(printResults(incidence, t, p)); 
     }
+    
+    public String[] getPlacesNames() {
+        return placesNames;
+    }
+    
+    public Matrix getPInvariants() {
+        return p;
+    }
+    
+    public Matrix getTInvariants() {
+        return t;
+    }    
     
     private int[][] getIncidenceMatrix() {
         List<Transition> transitions = petriNet.getTransitions();
