@@ -73,7 +73,7 @@ public class TreeModuleResultPane extends ResultPane {
                 + (resultSet.isBounded ? getGreenText("bounded")
                         : getRedText("NOT bounded")) + "</p>";
 
-        if (resultSet.stronglyConnectedComponentsCount > 0) {
+        if (resultSet.stronglyConnectedComponentsCount > 0) { // działa tylko jeżeli sieć jest ograniczona. WPP tu jest wpisane 0.
             text += "<p>Number of strongly connected components in execution graph: "
                     + (resultSet.stronglyConnectedComponentsCount) + "</p>";
 
@@ -96,6 +96,24 @@ public class TreeModuleResultPane extends ResultPane {
         } else {
             text += "<p>No deadlocks in the network found. As it is not bounded this means it "
                     + getGreenText("MIGHT BE deadlock-free") + "</p>";
+        }
+        
+        if (resultSet.isBounded) {
+            if (resultSet.allTransitionsInOneSSC) {
+                text += "<p>The network is "+getGreenText("L4 live")+"</p>";
+            } else if (resultSet.everyTransitionIsSomeSSC) {
+                text += "<p>The network is "+getGreenText("L3 live")+"</p>";
+            } else if (resultSet.allTransitionsReachable) {
+                text += "<p>The network is "+getGreenText("L1 live")+"</p>";
+            } else {
+                text += "<p>The network is "+getRedText("L0 live")+"</p>";
+            }
+        } else {
+            if (resultSet.allTransitionsReachable) {
+                text += "<p>Every transition can be fired - so the network is at least " + getGreenText("L1-live") +"</p>";
+            } else {
+                text += "<p>The network is not boundned and sufficient condition for L1 liveness is not met. The net might be of any liveness class</p>";
+            }
         }
 
         text += recursiveOutput(resultSet.rootVertex);

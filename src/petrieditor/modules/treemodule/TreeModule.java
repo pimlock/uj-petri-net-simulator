@@ -9,6 +9,8 @@ import petrieditor.modules.ResultPane;
 
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 
 /**
  * Module for constructing execution tree and graph and doing related analyses.
@@ -20,6 +22,11 @@ import java.util.*;
 public class TreeModule implements Module {
     private static final String MODULE_NAME = "Tree and graph";
 
+    class SSComponent {
+        HashSet<Transition> innerTransitions = new HashSet<Transition>();
+    }
+
+    
     /**
      * Returns the module name.
      */
@@ -40,19 +47,21 @@ public class TreeModule implements Module {
         for (Transition t : petriNet.getTransitions()) {
             for (Arc a : t.getInputArcs()) {
                 if (a instanceof InhibitorArc) {
-                    System.err.println("Inhibitor arc found, analysis not possible");
+                    JOptionPane.showMessageDialog(null,"Inhibitor arc found, analysis not possible", "Tree module", JOptionPane.ERROR_MESSAGE);
                     return null;
                 }
             }
         }
         
         dfsTreeConstruction(resultSet, resultSet.rootVertex); 
-        //foldGraph(resultSet);
+
+        if (resultSet.reachableTransitions.size() == resultSet.petriNet.getTransitions().size()) {
+            resultSet.allTransitionsReachable = true;
+        }
         
         if (resultSet.isBounded) {
             stronglyConnectedComponents(resultSet);
         }
-        
         
         return new TreeModuleResultPane(resultSet);
     }
@@ -83,6 +92,7 @@ public class TreeModule implements Module {
             resultSet.petriNet.setNetworkMarking(vertex.getMarking());
             
             if (transition.isEnabled()) {
+                resultSet.reachableTransitions.add(transition);
                 transition.fire();
                 GraphVertex newVertex = new GraphVertex(resultSet.petriNet.getNetworkMarking());
                 for (ArrayList<Integer> previous: dfsPathMarkings) {
@@ -118,33 +128,10 @@ public class TreeModule implements Module {
     private void dfsTreeConstruction(TreeModuleResultSet resultSet, GraphVertex vertex) {
         dfsTreeConstruction(resultSet, vertex, new LinkedList<ArrayList<Integer>>());
     }
-    
-    /**
-     * Folds the tree into a graph (by removing old/copy vertices).
-     * 
-     * unused currently, but correct and tested.
-     */
-    private void foldGraph(TreeModuleResultSet resultSet) {
-        Iterator<ArrayList<Integer>> it = resultSet.vertices.keySet().iterator();
-        while (it.hasNext()) { // for every original vertex
-            GraphVertex g = resultSet.vertices.get(it.next());// fetch the vertex
-            
-            HashSet<Transition> replaces = new HashSet<Transition>();
-            
-            for (Transition t : g.getExitTransitions()) { // for every transition - find vertices to be replaced
-                if (g.getExit(t).isCopy()) {
-                    replaces.add(t);
-                }
-            }
-            
-            for (Transition t : replaces) { // replace with the vertice (second phase to avoid ConcurrentModificationException)
-                g.addExit(t, g.getExit(t).getOriginal());
-            }
-        }
-    }
  
     /**
      * Finds the strongly connected components of the execution graph.
+     * And tests for L3 and L4 liveness classes in bounded nets.
      */
     private void stronglyConnectedComponents(TreeModuleResultSet resultSet) {
         HashMap<ArrayList<Integer>, GraphVertex> transposed = new HashMap<ArrayList<Integer>, GraphVertex>();
@@ -182,11 +169,61 @@ public class TreeModule implements Module {
         
         for (ArrayList<Integer> arrlist: sssnumbers.keySet()) {
             System.out.println(transposed.get(arrlist) + " " + sssnumbers.get(arrlist));
-            
         }
+
         transposed = null;
         visitTimes = null;
         resultSet.stronglyConnectedComponentsCount = sssId;
+
+        if (resultSet.isBounded && resultSet.allTransitionsReachable) { // got L1, seeking for higher
+            if (resultSet.stronglyConnectedComponentsCount == 1) { // got L4
+                resultSet.allTransitionsInOneSSC = resultSet.everyTransitionIsSomeSSC = true;
+            } else {
+                /**
+                 * This might be unnecessary if I prove that:
+                 *  - without inhibitor arcs
+                 *  - for bounded net.
+                 *  
+                 *  L3 == L4
+                 */
+                
+                SSComponent[] components = new SSComponent[sssId];
+                for (int i =0; i< sssId; i++) {
+                    components[i] =  new SSComponent();
+                }
+                for (ArrayList<Integer> state : sssnumbers.keySet()) {
+                    int sscnumber = sssnumbers.get(state);
+                    for (Transition t : resultSet.vertices.get(state).getExitTransitions()) {
+                        ArrayList<Integer> targetState = resultSet.vertices.get(state).getExit(t).getMarking();
+                        int targetsscnumber = sssnumbers.get(targetState);
+                        if (sscnumber == targetsscnumber) {
+                            components[sscnumber].innerTransitions.add(t);
+                        } 
+                    }
+                }
+                
+                // got tree of scc components
+                
+                for (int i = 0; i< components.length; i++) {
+                    if (components[i].innerTransitions.size() == resultSet.petriNet.getTransitions().size()) {
+                        resultSet.allTransitionsInOneSSC = true;
+                        break;
+                    }
+                }
+                
+                if (!resultSet.allTransitionsInOneSSC) {
+                    HashSet<Transition> inSomeSCC = new HashSet<Transition>();
+                    for (int i = 0; i< components.length; i++) {
+                        inSomeSCC.addAll(components[i].innerTransitions);
+                        if (inSomeSCC.size() == resultSet.petriNet.getTransitions().size()) {
+                            resultSet.everyTransitionIsSomeSSC = true;
+                            break;
+                        }
+                    }
+                }
+                
+            }
+        }
     }
 
     /**
