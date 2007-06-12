@@ -99,17 +99,17 @@ public class TreeModuleResultPane extends ResultPane {
         }
         
         if (resultSet.isBounded) {
-            if (resultSet.reachableTransitions.size() == resultSet.petriNet.getTransitions().size()) {
-                if (resultSet.stronglyConnectedComponentsCount  == 1) {
-                    text += "<p>The network is "+getGreenText("L4 live")+"</p>"; /// reversible + L1 = L4
-                } else {
-                    text += "<p>The network is "+getGreenText("L1 live")+"</p>";
-                }
+            if (resultSet.allTransitionsReachableFromEverySCC) {
+                text += "<p>The network is "+getGreenText("L4 live")+"</p>"; 
+            } else if (resultSet.everyTransitionsInSomeSCC) {
+                text += "<p>The network is "+getGreenText("L3 live")+"</p>";
+            } else if (resultSet.allTransitionsReachable) {
+                text += "<p>The network is "+getGreenText("L1 live")+"</p>";
             } else {
-                text += "<p>The network is "+getRedText("L0 live")+"</p>";   
+                text += "<p>The network is "+getRedText("L0 live")+"</p>";
             }
         } else {
-            if (resultSet.reachableTransitions.size() == resultSet.petriNet.getTransitions().size()) {
+            if (resultSet.allTransitionsReachable) {
                 text += "<p>Every transition can be fired - so the network is at least " + getGreenText("L1-live") +"</p>";
             } else {
                 text += "<p>The network is not boundned and sufficient condition for L1 liveness is not met. The net might be of any liveness class</p>";
