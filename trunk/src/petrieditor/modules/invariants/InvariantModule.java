@@ -25,6 +25,11 @@ public class InvariantModule implements Module {
     private PetriNet petriNet;
     private Matrix p;
     private Matrix t;
+    private boolean inhibitor;
+    
+    public InvariantModule() {
+        inhibitor = false;
+    }
     
     public String getName() {
         return MODULE_NAME;
@@ -98,10 +103,12 @@ public class InvariantModule implements Module {
             List<Arc> output = transition.getOutputArcs();
             
             for(Arc arc : input) {
+                if(arc.getWeight() == 0) inhibitor = true;
                 incidence[placeToNumber.get(arc.getPlace())][number] -= arc.getWeight();
             }
             
             for(Arc arc : output) {
+                if(arc.getWeight() == 0) inhibitor = true;
                 incidence[placeToNumber.get(arc.getPlace())][number] += arc.getWeight();
             }
             ++number;
@@ -114,7 +121,7 @@ public class InvariantModule implements Module {
         StringBuffer html = new StringBuffer();
         
         if(matrix.getRowDimension() == 0 || matrix.getColumnDimension() == 0) {
-            html.append("<div>None<br /></div>");
+            html.append("<div>None<br></div>");
         }
         else {
             html.append("<table border=\"1\" cellspacing=\"1\">");
@@ -161,6 +168,7 @@ public class InvariantModule implements Module {
                 "td.empty {background:#ffffff}" +
             "</style><body>"
         );
+        
         html.append("<h3>Incidence matrix:</h3>");
         
         html.append("<table border=\"1\" cellspacing=\"1\"><tr><td>&nbsp;</td>");
@@ -186,18 +194,28 @@ public class InvariantModule implements Module {
         
         html.append(printMatrix(t, transitionsNames));
         if(isCovered(t)) {
-            html.append("<br />The net is covered by positive T-Invariants, therefore it might be bounded and live.");
+            if(!inhibitor) {
+                html.append("<br>The net is covered by positive T-Invariants, therefore it is consistent and repetitive.");
+            }
+            else {
+                html.append("<br>The net is covered by positive T-Invariants, but there are inhibitor arcs, so we do not know if it is consistent and repetitive.");
+            }
         } else {
-            html.append("<br />The net is <strong>not</strong> covered by positive T-Invariants, therefore we do not know if it is bounded and live.");
+            html.append("<br>The net is <strong>not</strong> covered by positive T-Invariants, but there are inhibitor arcs, so the net might be consistent.");
         }
         
         html.append("<h3> P - Invariants: </h3>");
         
         html.append(printMatrix(p, placesNames));
         if(isCovered(p)) {
-            html.append("<br />The net is covered by positive P-Invariants, therefore it is bounded.");
+                html.append("<br>The net is covered by positive P-Invariants, therefore it is conservative and structuarally bounded.");
         } else {
-            html.append("<br />The net is <strong>not</strong> covered by positive P-Invariants, therefore we do not know if it is bounded.");
+            if(!inhibitor) {
+                html.append("<br>The net is <strong>not</strong> covered by positive P-Invariants, therefore it is not conservative, but we do not know if it is bounded.");
+            }
+            else {
+                html.append("<br>The net is <strong>not</strong> covered by positive P-Invariants, but there are inhibitor arcs, so the net might be conservative.");
+            }
         }
         
         html.append(printEquations(p, placesNames));
@@ -208,7 +226,7 @@ public class InvariantModule implements Module {
 
     private String printEquations(Matrix p, String[] placesNames) {
         StringBuffer html = new StringBuffer();
-        html.append("<br /><h4>Net equations:</h4>");
+        html.append("<br><h4>Net equations:</h4>");
         
         if(p.getColumnDimension() != 0) {
             List<Integer> marking = petriNet.getNetworkMarking();
@@ -220,8 +238,8 @@ public class InvariantModule implements Module {
                 ++placeNumber;
             }
             
-            boolean first = true;
             for(int i = 0; i < p.getColumnDimension(); ++i) {
+                boolean first = true;
                 
                 int tokens = 0;
                 int number = 0;
@@ -232,8 +250,8 @@ public class InvariantModule implements Module {
                         tokens += number * placeToTokenCount.get(places[j]);
                     }
                 }
-                html.append(" = " + tokens + "</br>");
-                
+
+                html.append(" = " + tokens + "<br>");           
             }
         }
         return html.toString();
