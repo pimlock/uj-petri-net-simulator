@@ -1,5 +1,6 @@
 package petrieditor.modules;
 
+import petrieditor.modules.basicstats.BasicStatistics;
 import petrieditor.modules.controllability.ControllabilityModule;
 import petrieditor.modules.invariants.InvariantModule;
 import petrieditor.modules.simulation.SimulationModule;
@@ -33,6 +34,9 @@ public class ModuleFinder {
         
         registredModules.add(SimulationModule.class);
         registredModulesName.add(new SimulationModule().getName());        
+        
+        registredModules.add(BasicStatistics.class);
+        registredModulesName.add(new BasicStatistics().getName());
     }
 
     public static List<Class> getModules() {
