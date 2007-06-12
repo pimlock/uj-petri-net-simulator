@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 /**
- * @author Piotr MÅ‚ocek
+ * @author Piotr Mlocek
  */
 public class Invariants {
     public static void testPInvariants(int m[][], Matrix inv) {
@@ -112,11 +112,15 @@ public class Invariants {
         
         int row = 0, pivot = 0;
         
+        // przekszalcenie macierzy tak incydencji do macierzy trojkatnej (przez eliminacje Gauss'a)
         while(row < rows && pivot < cols) {
+            // jesli na przekatnej jest zero to szukamy w wierszach ponizej elementow niezerowych
             while(pivot < cols && incidence.get(row, pivot) == 0) {
                 int k = row + 1;
                 while(k < rows && incidence.get(row,pivot) == 0 ) {
+                    // znaleziono wiersz o niezerowym elemencie na miejscu 'pivot'
                     if(incidence.get(k, pivot) != 0) {
+                        // zamieniamy wiersze ze soba (w macierzy incydencji i w bazie)
                         int tmp[] = incidence.getRowCopy(row);
                         incidence.setRow(row, incidence.getRow(k));
                         incidence.setRow(k, tmp);
@@ -132,22 +136,28 @@ public class Invariants {
                     ++pivot;
             }
             	
-            // cancellation of the not null fields in the column of pivot 
+            // eliminujemy wszystkie elementy kolumny 'pivot' ponizej wiersza 'row'
             if(pivot < cols) {
+                // oznacza, ¿e incidence[row][pivot] != 0
                 int k1 = incidence.get(row, pivot);
                 for(int k = row + 1; k < rows; ++k) {
-                    if( incidence.get(k, pivot) != 0 ) {
+                    // sprawdzamy wszystkie elementy kolumny 'pivot' ponizej wiersza 'row'
+                    if(incidence.get(k, pivot) != 0) {
+                        // jesli element jest niezerowy to eliminujemy
                         int k2 = incidence.get(k, pivot);
+                        // uaktualniamy wartosci miecierzy w wierszu 'k'
                         for(int j = pivot; j < cols; ++j)
+                            // incidence[k][j] = k1 * incidence[k][j] - k2 * incidence[row][j] (dla elementow o j = pivot daje to zero)
                             incidence.set(k, j, k1 * incidence.get(k, j) - k2 * incidence.get(row, j));
                         
+                        // uaktualniamy wartosci bazy w kolumnie 'k'
                         for(int j = 0; j < rows; ++j)
                             basis.set(k, j, k1 * basis.get(k, j) - k2 * basis.get(row, j));
                         
                         int l1[] = incidence.getRowCopy(k);
                         int l2[] = basis.getRowCopy(k);
                         
-                        // redukcja kolumn przez najwiekszy wspolny dzielnik, aby nie byÅ‚o przepeï¿½nienia
+                        // redukcja kolumn przez najwiekszy wspolny dzielnik, aby nie bylo przepelnienia
                         int fat1 = reduceByGcd(l1);
                         int fat2 = reduceByGcd(l2);
                         
@@ -170,14 +180,16 @@ public class Invariants {
             ++pivot;
         }
         
+        // sprawdzamy ilosc niezerowych wierszy macierzy incidence
         int inv = 0;
         for(int i = 0; i < rows; ++i)
             if(!isNonZero(incidence.getRow(i)))
                 ++inv;
-        
-        Matrix nbasis = new Matrix( inv, rows );
+            
+        // baza niezmiennikow
+        Matrix nbasis = new Matrix(inv, rows);
         inv = 0;
-        for( int i=0; i<rows; i++ )
+        for(int i = 0; i < rows; ++i)
             if(!isNonZero(incidence.getRow(i)))
                 nbasis.setRow(inv++, basis.getRow(i));
         basis = nbasis;
@@ -186,23 +198,30 @@ public class Invariants {
         return getPositive(basis).transpose();
     }
     
-    private static int[] getSupport( int []a) {
-        int res[] = new int[ a.length ];
-        for( int i=0;i<a.length; i++)
-            if( a[i] != 0 )
+    /**
+     * Zwraca support niezmiennika w postaci tablicy.
+     * Jesli na pozycji i jest 1 to oznacza to, ze element i nalezy do zbioru.
+     *
+     * @param a wektor, dla ktorego jest liczony support
+     * @return support wektora
+     */
+    private static int[] getSupport(int[] a) {
+        int res[] = new int[a.length];
+        for(int i = 0; i < a.length; ++i)
+            if(a[i] != 0)
                 res[i] = 1;
         return res;
     }
     
     
-    private static Matrix deleteNotReducableRows( Matrix basis ) {
+    private static Matrix deleteNotReducableRows(Matrix basis) {
         int row = 0, pivot = 0;
         int rows = basis.getRowDimension(), cols = basis.getColumnDimension();
         
         while(row < rows && pivot < cols ) {
-            while(pivot < cols && basis.get( row , pivot) == 0 ) {
+            while(pivot < cols && basis.get(row, pivot) == 0 ) {
                 int k = row + 1;
-                while( k < rows && basis.get(row,pivot) == 0 )
+                while(k < rows && basis.get(row, pivot) == 0 )
                     if(basis.get(k,pivot) != 0) {
                         int[] tmp = basis.getRowCopy(row);
                         basis.setRow(row, basis.getRow(k));
@@ -260,11 +279,27 @@ public class Invariants {
         return basis;
     }
     
+    /**
+     * Oblicza kombinacje liniowa wektora (k1 * a) i (k2 * b).
+     *
+     * @param a pierwszy wektor
+     * @param b drugi wektor
+     * @param c wektor wyjsciowy - wynik
+     * @param k1 mnoznik pierwszego wektora
+     * @param k2 mnoznik drugiego wektora
+     */
     private static void linearCombination( int a[], int b[], int c[], int k1, int k2) {
         for(int i = 0; i < a.length; ++i)
             c[i] = a[i] * k1 + b[i] * k2;
     }
     
+    /**
+     * Sprawdza, czy jeden zbior jest podzbiorem drugiego.
+     *
+     * @param a zbior, ktory ma byc podzbiorem
+     * @param b zbior, ktory ma byc nadzbiorem
+     * @return <b>true</b> jeœli a jest podzbiorem b, <b>false</b> w przeciwnym przypadku
+     */
     private static boolean isSubset(int[] a, int[] b) {
         for(int i = 0 ; i < a.length; ++i)
             if(a[i] == 1 && b[i] == 0)
@@ -272,11 +307,18 @@ public class Invariants {
         return true;
     }
     
+    /**
+     * Przeksztalca baze niezmiennikow, tak, aby byly one dodatnie.
+     *
+     * @param BB baza niezmiennikow
+     */
     private static Matrix getPositive(Matrix BB) {
         int rows = BB.getRowDimension(), cols = BB.getColumnDimension();
         
-        Vector< int[] > S = new Vector<int[]>(), B = new Vector<int[]>();
+        Vector<int[]> S = new Vector<int[]>();
+        Vector<int[]> B = new Vector<int[]>();
         
+        // wstawia do pomocniczych tablic niezmienniki i ich supporty
         for(int i = 0; i < rows; ++i) {
             B.add(BB.getRow(i));
             int t[] = new int[cols];
@@ -285,25 +327,32 @@ public class Invariants {
         }
         
         int j = 0;
-   
+        
+        // petla po wszystkich kolumnach bazy
         while(j < cols) {
             int i = 0;
+            // petla po wszystkich wektorach z tablicy pomocniczej
             while(i < B.size()) {
                 if(B.get(i)[j] < 0) {
+                    // i-ty niezmiennik na j-tej pozycji jest ujemny - przeksztalcamy reszte niezmiennikow na tej pozycji
                     int k = 0;
                     while(k < B.size()) {
+                        // dla wszystkich niezmiennikow, ktore maja na tej pozycji wartosci wieksze od zera
                         if(B.get(k)[j] > 0) {
                             int tmp[] = new int[cols];
                             int ns[] = new int[cols];
-                            
+                            // obliczamy kombinacje liniowa niezmienniki (i[j] * k) oraz (-k[j] * i)
                             linearCombination(B.get(k), B.get(i), tmp, B.get(i)[j], -B.get(k)[j]);
                             ns = getSupport(tmp);
                             
+                            // sprawdzamy, czy support nowego wektora jest nadzbiorem supporta 
+                            // innego wektora, ktory jest w pomocniczej tablicy
                             boolean exist = false;
                             for(int m = 0; m < B.size() && !exist; ++m) 
-                                if( isSubset(S.get(m), ns))
+                                if(isSubset(S.get(m), ns))
                                     exist = true;
                             
+                            // jesli nie byl nadzbiorem dla zadnego, to go dodajemy
                             if(!exist) {
                                 reduceByGcd(tmp);
                                 S.add(ns);
@@ -316,7 +365,10 @@ public class Invariants {
                 ++i;
             }
             
-            Vector<int[] > NS = new Vector<int[]>() , NB = new Vector<int[]>();
+            // uaktualniamy tablice pomocnicze S i B
+            // w tablicach pozostaja tylko te wektory, ktore maja na pozycji j-tej wartosc >= 0
+            Vector<int[]> NS = new Vector<int[]>();
+            Vector<int[]> NB = new Vector<int[]>();
             for(i = 0; i < B.size(); ++i) {
                 if(B.get(i)[j] >= 0) {
                     NS.add(S.get(i));
@@ -327,6 +379,8 @@ public class Invariants {
             S = NS; B = NB;
             ++j;
         }
+        
+        // zwracamy baze niezmiennikow, juz bez elementow ujemnych
         Matrix basis = new Matrix(B.size(), cols);
         for(int i = 0; i < B.size(); ++i)
             basis.setRow(i, B.get(i));
