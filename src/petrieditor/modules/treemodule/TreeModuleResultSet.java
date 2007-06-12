@@ -38,6 +38,15 @@ class TreeModuleResultSet {
     // Reachable transitions (they are sure to be L1; in bounded nets only those are L1)
     HashSet<Transition> reachableTransitions = new HashSet<Transition>();
 
+    // for bounded - iff for L1, for unbounded - sufficient for L1.
+    boolean allTransitionsReachable = false;
+    
+    //this means L4 for bounded nets. For unbounded it is meaningless
+    boolean allTransitionsReachableFromEverySCC = false;
+    
+    //this means L3 for bounded nets. For unbounded it is meaningless
+    boolean everyTransitionsInSomeSCC = false;
+    
     TreeModuleResultSet(PetriNet net) {
         this.petriNet = net;
         

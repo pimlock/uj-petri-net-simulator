@@ -24,6 +24,8 @@ public class TreeModule implements Module {
 
     class SSComponent {
         HashSet<Transition> innerTransitions = new HashSet<Transition>();
+        HashSet<SSComponent> exits = new HashSet<SSComponent>();
+        HashSet<Transition> reachableTransitions = new HashSet<Transition>();
     }
 
     
@@ -55,6 +57,10 @@ public class TreeModule implements Module {
         
         dfsTreeConstruction(resultSet, resultSet.rootVertex); 
        
+        if (resultSet.reachableTransitions.size() == resultSet.petriNet.getTransitions().size()) {
+            resultSet.allTransitionsReachable = true;
+        }
+        
         if (resultSet.isBounded) {
             stronglyConnectedComponents(resultSet);
         }
@@ -170,6 +176,47 @@ public class TreeModule implements Module {
         transposed = null;
         visitTimes = null;
         resultSet.stronglyConnectedComponentsCount = sssId;
+        
+        if (resultSet.isBounded && resultSet.allTransitionsReachable) {
+            if (resultSet.stronglyConnectedComponentsCount == 1) {
+                resultSet.allTransitionsReachableFromEverySCC = resultSet.everyTransitionsInSomeSCC = true; /// reversible + L1 = L4
+            } else {
+                SSComponent components[] = new SSComponent[sssId];
+                for (int i =0; i< sssId; i++) {
+                    components[i] = new SSComponent();
+                }
+                
+                for (ArrayList<Integer> marking: sssnumbers.keySet()) {
+                    int compNumber = sssnumbers.get(marking);
+                    GraphVertex vertex  = resultSet.vertices.get(marking);
+                    for (Transition t : vertex.getExitTransitions()) {
+                        GraphVertex  targetVertex = vertex.getExit(t).getPrimaryVertex();
+                        int targetCompNumber = sssnumbers.get(targetVertex.getMarking());
+                        if (compNumber == targetCompNumber) {
+                            components[compNumber].innerTransitions.add(t);
+                        } else {
+                            components[compNumber].exits.add(components[targetCompNumber]);
+                        }
+                    }
+                }
+                HashSet<Transition> allInnerTransitions = sscTransitionReachanilityDFS(components[sssnumbers.get(resultSet.rootVertex.getMarking())]);
+                
+                if (allInnerTransitions.size() == resultSet.petriNet.getTransitions().size()) {
+                    resultSet.everyTransitionsInSomeSCC = true;
+                    if (!resultSet.deadlockFound) {
+                        resultSet.allTransitionsReachableFromEverySCC = true;
+
+                        for (int i = 0; i < sssId; i++) {
+                            if (components[i].reachableTransitions.size() != resultSet.petriNet.getTransitions().size()) {
+                                resultSet.allTransitionsReachableFromEverySCC = false;
+                                break;
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -215,5 +262,14 @@ public class TreeModule implements Module {
         
         vertex.colour = GraphVertex.Colour.BLACK;
         return true;
+    }
+    
+    private HashSet<Transition> sscTransitionReachanilityDFS (SSComponent myComponent) {
+        HashSet<Transition> rt = new HashSet<Transition>(myComponent.innerTransitions);
+        for (SSComponent tComponent: myComponent.exits) {
+            rt.addAll(sscTransitionReachanilityDFS(tComponent));
+        }
+        myComponent.reachableTransitions = rt;
+        return rt;
     }
 }
