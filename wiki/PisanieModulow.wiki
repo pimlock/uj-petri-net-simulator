@@ -19,7 +19,6 @@ public class MyModule implements Module {
     }
 
     public void run(PetriNet petriNet) {
-
         // wykonuje jakies obliczenia na modelu petriNet
 
         // niech na razie modul wypisuje wyjscie na wyjscie standardowe :)
@@ -29,6 +28,4 @@ public class MyModule implements Module {
     }
 }
 }}}
-
-
 
